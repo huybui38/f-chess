@@ -64,7 +64,7 @@ function onReady() {
     let roomID = $("#roomID").val();
     socket.emit("gameRoom", produceEvent(roomEvent.joinRoom, roomID));
   });
-  $("#myBoard").hide();
+//   $("#myBoard").hide();
   const board = Xiangqiboard("myBoard", config);
 }
 

@@ -25,5 +25,8 @@ public class FChessApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FChessApplication.class, args);
+        //TEST HERE
+
+        //
     }
 }
