@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <base href="../">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Chess</title>
+    <link rel="stylesheet" href="css/xiangqiboard-0.3.3.css">
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+</head>
+
+<body>
+<img src="img/xiangqipieces/wikipedia/rK.svg" alt="" class="piece-1e8b9" data-piece="rK"
+     style="width:49px;height:49px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 100vw;">
+    <div id="myBoard" style="width: 450px"></div>
+</div>
+
+<script src="js/xiangqiboard-0.3.3.js"></script>
+<script>
+    function onChange(oldPos, newPos) {
+        console.log('Position changed:');
+        console.log('Old position: ' + Xiangqiboard.objToFen(oldPos));
+        console.log('New position: ' + Xiangqiboard.objToFen(newPos));
+        console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    }
+
+    function onDragStart(source, piece, position, orientation) {
+        console.log('Drag started:');
+        console.log('Source: ' + source);
+        console.log('Piece: ' + piece);
+        console.log('Position: ' + Xiangqiboard.objToFen(position));
+        console.log('Orientation: ' + orientation);
+        console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    }
+
+    const config = {
+        draggable: true,
+        dropOffBoard: 'snapback',
+        position: 'start',
+        onChange: onChange,
+        onDragStart: onDragStart,
+    };
+
+    const board = Xiangqiboard('myBoard', config);
+
+    // $('#B31Btn').on('click', function () {
+    //     const B31 = 'r1bakab1r/9/1cn2cn2/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/9/RNBAKABR1';
+    //     board.position(B31);
+    // });
+
+    // $('#startPositionBtn').on('click', board.start);
+</script>
+</body>
+
+</html>
