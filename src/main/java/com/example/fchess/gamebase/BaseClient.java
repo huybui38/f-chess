@@ -29,7 +29,7 @@ public class BaseClient extends AbstractBaseClient{
     }
     public boolean canRemove() {
         DateTime now = DateTime.now();
-        if (disconnectedAt.isBefore(now)) {
+        if (disconnectedAt != null && disconnectedAt.isBefore(now)) {
             Seconds diff = Seconds.secondsBetween(disconnectedAt, now);
             return diff.getSeconds() >= DEFAULT_TIMEOUT;
         }

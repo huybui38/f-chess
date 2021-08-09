@@ -1,16 +1,32 @@
 package com.example.fchess.gamebase;
 
-public class GamePacket {
-    String eventName;
-    Object data;
+import com.example.fchess.enums.eChessPackage;
+import com.example.fchess.interfaces.IGamePacket;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
+
+public class GamePacket implements IGamePacket {
+    String eventName;
+    boolean isSuccess;
+    Object data;
+    private HashMap<String, Object> map;
+    private final ObjectMapper mapper = new ObjectMapper();
     public GamePacket(String eventName){
         this.eventName = eventName;
+        this.map = new HashMap<>();
+    }
+    public GamePacket(String eventName, Object data) {
+        this(eventName);
+        this.data = data;
+
+    }
+    public GamePacket(eChessPackage chessPackage){
+        this(chessPackage.getValue());
     }
 
-    public GamePacket(String eventName, Object data) {
-        this.eventName = eventName;
-        this.data = data;
+    public void setSuccess(boolean success) {
+        isSuccess = success;
     }
 
     public String getEventName() {
@@ -21,7 +37,17 @@ public class GamePacket {
         return data;
     }
 
-    public void setData(Object data) {
-        this.data = data;
+    @Override
+    public boolean writeData(String key, Object data){
+        if (map.containsKey(key))
+            return false;
+        map.put(key, data);
+        return true;
     }
+
+    @Override
+    public void serialize() {
+        this.data = mapper.convertValue(map, Object.class);
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.fchess.interfaces;
 
+import com.example.fchess.enums.eChessPackage;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,7 +11,7 @@ import java.lang.reflect.Type;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface PacketHandler {
-    String packetName();
+    eChessPackage packetName();
     Class handler();
     Class dataType();
 }

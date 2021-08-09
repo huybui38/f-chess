@@ -36,13 +36,13 @@ public class SocketProcessor {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                log.debug("Scan for clearing unused client...");
+                log.debug("Scan for clearing unused client (Total:{})...", clients.size());
                 clearUnusedClient();
             }
         }, 0, 15, TimeUnit.SECONDS);
         clients = new ConcurrentHashMap<>();
         handlers = new HashMap<>();
-        this.namespace = server.addNamespace("/chat");
+        this.namespace = server.addNamespace("/chess");
         this.namespace.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
         searchService();
@@ -55,8 +55,8 @@ public class SocketProcessor {
         for (BeanDefinition bd : scanner.findCandidateComponents("com.example.fchess.packethandler")){
             IPacketHandler handler = (IPacketHandler) Class.forName(bd.getBeanClassName()).newInstance();
             PacketHandler ano = handler.getClass().getAnnotation(PacketHandler.class);
-            this.namespace.addEventListener(ano.packetName(), ano.dataType(), wrapperHandler(ano.packetName()));
-            registerHandler(ano.packetName(), handler);
+            this.namespace.addEventListener(ano.packetName().getValue(), ano.dataType(), wrapperHandler(ano.packetName().getValue()));
+            registerHandler(ano.packetName().getValue(), handler);
         }
     }
     private DataListener wrapperHandler(String packet){
@@ -100,7 +100,7 @@ public class SocketProcessor {
             }
             clients.put(token, base);
             base.onConnected();
-            log.debug("Client[{}] - Connected to chat module through '{}'", client.getSessionId().toString(), handshakeData.getUrl());
+            log.info("Client[{}] - Connected to chat module through '{}'", token, handshakeData.getUrl());
         };
     }
     private void registerHandler(String id, IPacketHandler handler){
@@ -113,7 +113,7 @@ public class SocketProcessor {
             if ( base != null){
                 base.setDisconnectedAt(DateTime.now());
             }
-            log.debug("Client[{}] - Disconnected from chat module.", client.getSessionId().toString());
+            log.debug("Client[{}] - Disconnected from chat module.", token);
         };
     }
 }
