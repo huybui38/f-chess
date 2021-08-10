@@ -50,4 +50,9 @@ public class BaseClient extends AbstractBaseClient{
         disconnectedAt = DateTime.now().plusDays(1);
     }
 
+    @Override
+    protected void onClosed() {
+        
+    }
+
 }

@@ -5,3 +5,31 @@
     flex-direction: column;
     width: 100vw;
 }
+#console {
+    height: 200px;
+    width: 400px;
+    overflow: auto;
+}
+
+.username-msg {
+    color: orange;
+}
+
+.connect-msg {
+    color: green;
+}
+
+.disconnect-msg {
+    color: red;
+}
+.choose-team{
+    display: flex;
+    flex-direction: row;
+   
+}
+.team{
+    margin-right:10px;
+    padding:10px;
+    border: solid;
+    cursor: pointer;
+}

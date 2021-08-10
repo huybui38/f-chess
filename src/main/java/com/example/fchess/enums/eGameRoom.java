@@ -1,7 +1,11 @@
 package com.example.fchess.enums;
 
 public enum eGameRoom {
-    JOIN_ROOM(1);
+    JOIN_ROOM(1),
+
+    CREATE_ROOM(2),
+    CHAT(3),
+    SELECT_TEAM(4);
 
     public final int label;
      eGameRoom(int label) {
