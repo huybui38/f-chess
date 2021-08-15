@@ -20,12 +20,23 @@ function onDragStart(source, piece, position, orientation) {
   console.log("Drag started:");
   console.log("Source: " + source);
   console.log("Piece: " + piece);
-  console.log("Position: " + Xiangqiboard.objToFen(position));
+  console.log("Position: " + Xiangqiboard.objToFen(position) +  "--" + JSON.stringify(position));
   console.log("Orientation: " + orientation);
   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+}
+function onDrop(source, target, piece, newPos, oldPos, orientation){
+    window.socket.emit("gameData", produceEvent(gameEvent.gameData,{
+        newPosition:Xiangqiboard.objToFen(newPos)
+    }));
+    return 'snapback';
 }
 const HASH_MESSAGE = {
     "GAME_ROOM.CHAT.PLAYER_JOINED":"Player {0} has joined the room!"
+}
+const TEAM = {
+    RED:0,
+    BLACK:1
 }
 const getHashMessage = (hash) => {
     if (!HASH_MESSAGE[hash]) return hash;
@@ -37,6 +48,7 @@ const config = {
   position: "start",
   onChange: onChange,
   onDragStart: onDragStart,
+  onDrop:onDrop
 };
 $(onReady);
 function initEvent(socket){
@@ -44,9 +56,27 @@ function initEvent(socket){
         console.log("onConnected");
     });
     socket.on("gameRoom", initGameRoomEvent)
+    socket.on("gameData", initGameDataEvent)
     socket.on("notify", (response) => alert(response.msg));
 }
-
+function initGameDataEvent(response){
+    console.log(response);
+    switch (response.type) {
+        case gameEvent.gameData:
+            let pos = response.position;
+            let turn = response.turn;
+            console.log(`pos:${pos} - turn: ${turn}`);
+            if (turn === TEAM.RED){
+                $("#red").toggleClass("current", true);
+                $("#black").toggleClass("current", false);
+            }else {
+                $("#red").toggleClass("current", false);
+                $("#black").toggleClass("current", true);
+            }
+            window.board.position(pos, true);
+            break;
+    }
+}
 function initGameRoomEvent(response){
     console.log(response);
     switch (response.type) {
@@ -67,6 +97,10 @@ function initGameRoomEvent(response){
                 output('<span class="username-msg">' + response.userName + ':</span> ' + response.message);
             }
             break;
+        case roomEvent.startGame:
+            console.log("game start...")
+            $("#myBoard").show();
+            break;
         case roomEvent.selectTeam:
             $(`#red > span`).html(response.red);
             $(`#black > span`).html(response.black);
@@ -77,6 +111,10 @@ function initGameRoomEvent(response){
             $(`#black > span`).html(response.black);
             $(`#red  > span`).show();
             $(`#black  > span`).show();
+            if (response.isPlaying){
+                $("#myBoard").show();
+                window.board.position(response.position, true);
+            }
             break;
         default:
             break;
@@ -89,6 +127,9 @@ const roomEvent = {
     selectTeam:4,
     roomInfo:5,
     startGame:6
+}
+const gameEvent = {
+    gameData:0
 }
 function produceEvent(eventType, data){
     return {
@@ -132,5 +173,6 @@ function onReady() {
   $("#red").on("click", () => onSelectTeam(socket, 0));
   $("#black").on("click", () => onSelectTeam(socket, 1));
   $("#btnStartGame").on("click",() => sendStartGame(socket))
-  const board = Xiangqiboard("myBoard", config);
+  window.board = Xiangqiboard("myBoard", config);
+  window.socket = socket;
 }

@@ -8,18 +8,17 @@ import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 public class GameClient extends BaseClient {
 
     public PlayerInfo playerInfo;
+    public GamePlayer gamePlayer;
     public BaseGameRoom currentBaseGameRoom;
     private PacketClientLib out;
     public PacketClientLib Out(){
         return out;
     }
-    private boolean isViewer;
-
     public GameClient(SocketIOClient socket, String userID) {
         super(socket, userID);
         LoadFromDatabase();
         out = new PacketClientLib(this);
-        this.isViewer = true;
+        gamePlayer = new GamePlayer();
     }
     private void LoadFromDatabase(){
         playerInfo = new PlayerInfo(userID);
@@ -39,13 +38,7 @@ public class GameClient extends BaseClient {
             currentBaseGameRoom.onPlayerClosed(this);
         }
     }
-    public boolean isViewer() {
-        return isViewer;
-    }
 
-    public void setViewer(boolean viewer) {
-        isViewer = viewer;
-    }
     @Override
     protected void onConnected() {
         super.onConnected();

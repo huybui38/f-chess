@@ -9,4 +9,5 @@ public interface IPacketLib {
     void sendJoinNotifyAllPlayersInRoom(String roomID);
     void sendPlayerSlots(BaseGameRoom room);
     GamePacket sendInfoChessRoom(XiangqiGameRoom room);
+    GamePacket sendGameDataBoard(String position, int turn);
 }

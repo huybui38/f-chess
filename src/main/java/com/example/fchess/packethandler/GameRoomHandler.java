@@ -2,6 +2,7 @@ package com.example.fchess.packethandler;
 
 import com.example.fchess.enums.eChessPackage;
 import com.example.fchess.enums.eGameRoom;
+import com.example.fchess.gamebase.GamePacket;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 import com.example.fchess.gameserver.managers.GameRoomManager;
@@ -52,14 +53,19 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.START_GAME.INVALID_ROOM");
                     return;
                 }
-                if (client.isViewer()){
+                if (client.gamePlayer.isViewer()){
                     client.Out().sendMessage("GAME_ROOM.START_GAME.INVALID_CLIENT");
                     return;
                 }
-                if (client.currentBaseGameRoom.getReady() != 2){
+                if (!client.currentBaseGameRoom.canStartGame()){
                     client.Out().sendMessage("GAME_ROOM.START_GAME.NOT_ENOUGH_PLAYER");
                     return;
                 }
+                client.currentBaseGameRoom.startGame();
+                GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+                pkg.writeType(eGameRoom.START_GAME.getValue());
+                pkg.serialize();
+                client.Out().sendToAllInRoom(pkg, client.currentBaseGameRoom.getRoomID());
                 break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());

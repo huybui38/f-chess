@@ -1,6 +1,7 @@
 package com.example.fchess.gamepacket;
 
 import com.example.fchess.enums.eChessPackage;
+import com.example.fchess.enums.eGameData;
 import com.example.fchess.enums.eGameRoom;
 import com.example.fchess.gamebase.GamePacket;
 import com.example.fchess.gameserver.GameClient;
@@ -57,15 +58,31 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.writeData("red", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
         pkg.writeData("black", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
         pkg.writeData("ready",room.getReady());
+        pkg.writeData("isPlaying",room.isPlaying());
+        if (room.isPlaying()){
+            pkg.writeData("currentPosition", room.getGame().getCurrentPosition());
+            pkg.writeData("turn", room.getGame().getCurrentTurn());
+        }
         pkg.serialize();
         this.send(pkg);
         return pkg;
     }
+
+    @Override
+    public GamePacket sendGameDataBoard(String position, int turn) {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_DATA);
+        pkg.writeType(eGameData.GAME_DATA.getValue());
+        pkg.writeData("position", position);
+        pkg.writeData("turn", turn);
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
+        return pkg;
+    }
+
     @Override
     public void sendToAllInRoom(GamePacket gamePacket, String roomID) {
         client.getSocket().getNamespace().getRoomOperations(roomID).sendEvent(gamePacket.getEventName(), gamePacket.getData());
     }
-
     @Override
     public void sendToAll(GamePacket gamePacket) {
         client.getSocket().getNamespace().getBroadcastOperations().sendEvent(gamePacket.getEventName(), gamePacket.getData());
