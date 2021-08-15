@@ -1,7 +1,7 @@
 package com.example.fchess.gameobjects.Xiangqi;
 
-public class Elephant extends XiangqiPiece{
-    public Elephant() {
+public class Pawn extends  XiangqiPiece{
+    public Pawn() {
     }
 
     @Override
