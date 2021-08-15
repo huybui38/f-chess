@@ -1,9 +1,6 @@
-package com.example.fchess.gameserver;
+package com.example.fchess.gameserver.xiangqiroom;
 
-import com.example.fchess.enums.eChessPackage;
-import com.example.fchess.enums.eGameRoom;
-import com.example.fchess.gamebase.GamePacket;
-import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
+import com.example.fchess.gameserver.GameClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,12 +21,15 @@ public class XiangqiGameRoom extends BaseGameRoom {
     @Override
     public void addPlayer(GameClient player) {
         super.addPlayer(player);
-       player.Out().sendJoinNotifyAllPlayersInRoom(this.getRoomID());
+
+        player.Out().sendJoinNotifyAllPlayersInRoom(this.getRoomID());
+        player.Out().sendInfoChessRoom(this);
     }
 
     @Override
     public void onPlayerReconnect(GameClient player) {
         player.Out().sendJoinNotifyAllPlayersInRoom(this.getRoomID());
+        player.Out().sendInfoChessRoom(this);
         log.debug("onPlayerReconnect");
     }
 
@@ -39,14 +39,14 @@ public class XiangqiGameRoom extends BaseGameRoom {
             this.removePlayerByClient(client);
         }
     }
-
     @Override
     public void onRemovePlayerFromSlot(GameClient client, int slot) {
-        client.Out().sendPlayerChooseTeam(false, "", slot);
+        client.Out().sendPlayerSlots( this);
+        client.setViewer(true);
     }
-
     @Override
     public void onAddPlayerToSlot(GameClient client) {
-
+        client.Out().sendPlayerSlots( this);
+        client.setViewer(false);
     }
 }

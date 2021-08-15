@@ -4,7 +4,6 @@ import com.example.fchess.enums.eChessPackage;
 import com.example.fchess.enums.eGameRoom;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.gamebase.GamePacket;
-import com.example.fchess.gameserver.XiangqiGameRoom;
 import com.example.fchess.gameserver.managers.GameRoomManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

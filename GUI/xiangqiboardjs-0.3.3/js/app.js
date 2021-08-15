@@ -46,6 +46,7 @@ function initEvent(socket){
     socket.on("gameRoom", initGameRoomEvent)
     socket.on("notify", (response) => alert(response.msg));
 }
+
 function initGameRoomEvent(response){
     console.log(response);
     switch (response.type) {
@@ -67,14 +68,15 @@ function initGameRoomEvent(response){
             }
             break;
         case roomEvent.selectTeam:
-            let team = response.team === 0 ? 'red' :'black'; 
-            if (response.isAdded){
-                $(`#${team} > span`).html(response.data);
-                $(`#${team} > span`).show();
-            }else {
-                $(`#${team} > span`).html("");
-                $(`#${team} > span`).hide();
-            }
+            $(`#red > span`).html(response.red);
+            $(`#black > span`).html(response.black);
+            $(`#red  > span`).show();
+            $(`#black  > span`).show();
+        case roomEvent.roomInfo:
+            $(`#red > span`).html(response.red);
+            $(`#black > span`).html(response.black);
+            $(`#red  > span`).show();
+            $(`#black  > span`).show();
             break;
         default:
             break;
@@ -84,7 +86,9 @@ const roomEvent = {
     joinRoom:1,
     createRoom:2,
     chat:3,
-    selectTeam:4
+    selectTeam:4,
+    roomInfo:5,
+    startGame:6
 }
 function produceEvent(eventType, data){
     return {
@@ -99,6 +103,9 @@ function output(message) {
  }
  function onSelectTeam(socket, team){
     socket.emit("gameRoom", produceEvent(roomEvent.selectTeam, team));
+ }
+ function sendStartGame(socket){
+    socket.emit("gameRoom", produceEvent(roomEvent.startGame));
  }
 let currentRoom = null
 function onReady() {
@@ -124,5 +131,6 @@ function onReady() {
   $("#myBoard").hide();
   $("#red").on("click", () => onSelectTeam(socket, 0));
   $("#black").on("click", () => onSelectTeam(socket, 1));
+  $("#btnStartGame").on("click",() => sendStartGame(socket))
   const board = Xiangqiboard("myBoard", config);
 }

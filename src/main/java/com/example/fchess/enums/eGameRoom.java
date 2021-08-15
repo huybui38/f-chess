@@ -5,7 +5,10 @@ public enum eGameRoom {
 
     CREATE_ROOM(2),
     CHAT(3),
-    SELECT_TEAM(4);
+    SELECT_TEAM(4),
+   ROOM_INFO (5),
+    START_GAME (6),
+    ;
 
     public final int label;
      eGameRoom(int label) {

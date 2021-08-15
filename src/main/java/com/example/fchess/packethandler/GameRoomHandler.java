@@ -45,7 +45,21 @@ public class GameRoomHandler  implements IPacketHandler{
                     return;
                 }
                 client.currentBaseGameRoom.addPlayerToSlot(team, client);
-                client.Out().sendPlayerChooseTeam(true, client.playerInfo.getUserID(), team);
+//                client.Out().sendPlayerSlots(client.currentBaseGameRoom);
+                break;
+            case START_GAME:
+                if (client.currentBaseGameRoom == null){
+                    client.Out().sendMessage("GAME_ROOM.START_GAME.INVALID_ROOM");
+                    return;
+                }
+                if (client.isViewer()){
+                    client.Out().sendMessage("GAME_ROOM.START_GAME.INVALID_CLIENT");
+                    return;
+                }
+                if (client.currentBaseGameRoom.getReady() != 2){
+                    client.Out().sendMessage("GAME_ROOM.START_GAME.NOT_ENOUGH_PLAYER");
+                    return;
+                }
                 break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());

@@ -1,17 +1,18 @@
 package com.example.fchess.gamepacket;
 
-import com.corundumstudio.socketio.SocketIOClient;
 import com.example.fchess.enums.eChessPackage;
 import com.example.fchess.enums.eGameRoom;
 import com.example.fchess.gamebase.GamePacket;
 import com.example.fchess.gameserver.GameClient;
+import com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom;
+import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 import com.example.fchess.interfaces.IChessSocket;
 import com.example.fchess.interfaces.IPacketLib;
 
-public class PacketLib implements IPacketLib, IChessSocket {
+public class PacketClientLib implements IPacketLib, IChessSocket {
     private GameClient client;
 
-    public PacketLib(GameClient client){
+    public PacketClientLib(GameClient client){
         this.client = client;
     }
 
@@ -37,16 +38,29 @@ public class PacketLib implements IPacketLib, IChessSocket {
     }
 
     @Override
-    public void sendPlayerChooseTeam(boolean isAdded, String data, int team) {
+    public void sendPlayerSlots(BaseGameRoom room) {
         GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.SELECT_TEAM.getValue());
-        pkg.writeData("isAdded", isAdded);
-        pkg.writeData("data", data);
-        pkg.writeData("team", team);
+        GameClient[] slots = room.getSlots();
+        pkg.writeData("red", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
+        pkg.writeData("black", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("ready",room.getReady());
         pkg.serialize();
         this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
     }
 
+    @Override
+    public GamePacket sendInfoChessRoom(XiangqiGameRoom room) {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+        pkg.writeType(eGameRoom.ROOM_INFO.getValue());
+        GameClient[] slots = room.getSlots();
+        pkg.writeData("red", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
+        pkg.writeData("black", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("ready",room.getReady());
+        pkg.serialize();
+        this.send(pkg);
+        return pkg;
+    }
     @Override
     public void sendToAllInRoom(GamePacket gamePacket, String roomID) {
         client.getSocket().getNamespace().getRoomOperations(roomID).sendEvent(gamePacket.getEventName(), gamePacket.getData());
