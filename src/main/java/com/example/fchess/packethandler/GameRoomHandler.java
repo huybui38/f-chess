@@ -2,8 +2,9 @@ package com.example.fchess.packethandler;
 
 import com.example.fchess.enums.eChessPackage;
 import com.example.fchess.enums.eGameRoom;
-import com.example.fchess.gamebase.GameClient;
-import com.example.fchess.gamebase.GamePacket;
+import com.example.fchess.gameserver.GameClient;
+import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
+import com.example.fchess.gameserver.managers.GameRoomManager;
 import com.example.fchess.interfaces.IPacketHandler;
 import com.example.fchess.interfaces.PacketHandler;
 import com.example.fchess.transmodel.DataPackage;
@@ -20,22 +21,52 @@ public class GameRoomHandler  implements IPacketHandler{
         eGameRoom packageType = eGameRoom.fromId(dataPackage.getType());
         switch (packageType){
             case JOIN_ROOM:
-                handleJoinGame(client, dataPackage.getData().toString());
+                handleJoinGameRoom(client, dataPackage.getData().toString());
+                break;
+            case CREATE_ROOM:
+                if (client.currentBaseGameRoom != null){
+                    client.Out().sendMessage("GAME_ROOM.CREATE_ROOM.ALREADY_IN_ROOM");
+                    return;
+                }
+                GameRoomManager.addRoom(client);
+                break;
+            case SELECT_TEAM:
+                int team =  Integer.parseInt(dataPackage.getData().toString());
+                if (client.currentBaseGameRoom == null){
+                    client.Out().sendMessage("GAME_ROOM.SELECT_TEAM.ROOM_NOT_FOUND");
+                    return;
+                }
+                if (team > 1 || team < 0){
+                    client.Out().sendMessage("GAME_ROOM.SELECT_TEAM.INVALID_TEAM");
+                    return;
+                }
+                if (!client.currentBaseGameRoom.findSlot(team)){
+                    client.Out().sendMessage("GAME_ROOM.SELECT_TEAM.POSITION_BUSY");
+                    return;
+                }
+                client.currentBaseGameRoom.addPlayerToSlot(team, client);
+                client.Out().sendPlayerChooseTeam(true, client.playerInfo.getUserID(), team);
                 break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());
                 break;
         }
     }
-    private void handleJoinGame(GameClient client, String roomID) {
-        if (client.getCurrentRoomID() != null && client.getCurrentRoomID().equals(roomID)){
+    private void handleJoinGameRoom(GameClient client, String roomID) {
+        if (client.currentBaseGameRoom != null){
+            client.Out().sendMessage("GAME_ROOM.JOIN_ROOM.ALREADY_IN_ROOM");
             return;
         }
-        client.setCurrentRoomID(roomID);
-        GamePacket response = new GamePacket(eChessPackage.GAME_ROOM);
-        response.writeData("type", eGameRoom.JOIN_ROOM.getValue());
-        response.writeData("roomID", roomID);
-        response.serialize();
-        client.getChessSocket().send(response);
+        BaseGameRoom room = GameRoomManager.findRoomByID(roomID);
+        if (room == null){
+            client.Out().sendMessage("GAME_ROOM.JOIN_ROOM.NOT_FOUND");
+            return;
+        }
+        if (room.findPlayerByID(client.playerInfo.getUserID()) != null){
+            client.Out().sendMessage("GAME_ROOM.JOIN_ROOM.EXISTED");
+            return;
+        }
+        room.addPlayer(client);
+        client.Out().sendJoinRoom(roomID);
     }
 }

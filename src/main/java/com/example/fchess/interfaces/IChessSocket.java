@@ -6,4 +6,5 @@ public interface IChessSocket {
     void sendToAllInRoom(GamePacket gamePacket, String roomID);
     void sendToAll(GamePacket gamePacket);
     void send(GamePacket gamePacket);
+    void sendMessage(String msg);
 }
