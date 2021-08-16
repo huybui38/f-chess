@@ -1,26 +1,16 @@
 package com.example.fchess.gameserver;
 
-public class GamePlayer {
+public class GamePlayer extends AbstractGamePlayer{
 
-    public GamePlayer() {
-        this.isViewer = true;
-        this.team = -1;
+    public GamePlayer(String userID) {
+        super(userID);
     }
-    private boolean isViewer;
+    @Override
+    public void onWinning() {
 
-    public int getTeam() {
-        return team;
     }
+    @Override
+    public void onLosing() {
 
-    public void setTeam(int team) {
-        this.team = team;
-    }
-
-    private int team;
-    public boolean isViewer() {
-        return isViewer;
-    }
-    public void setViewer(boolean viewer) {
-        isViewer = viewer;
     }
 }

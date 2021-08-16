@@ -62,6 +62,10 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         if (room.isPlaying()){
             pkg.writeData("currentPosition", room.getGame().getCurrentPosition());
             pkg.writeData("turn", room.getGame().getCurrentTurn());
+            pkg.writeData("isViewer", this.client.gamePlayer.isViewer());
+            if (this.client.gamePlayer.isViewer() == false){
+                pkg.writeData("team", this.client.gamePlayer.getTeam());
+            }
         }
         pkg.serialize();
         this.send(pkg);
@@ -74,6 +78,38 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.writeType(eGameData.GAME_DATA.getValue());
         pkg.writeData("position", position);
         pkg.writeData("turn", turn);
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
+        return pkg;
+    }
+
+    @Override
+    public GamePacket sendEndGame(String winnerName) {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_DATA);
+        pkg.writeType(eGameData.GAME_END.getValue());
+        pkg.writeData("winnerName", winnerName);
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
+        return pkg;
+    }
+
+    @Override
+    public GamePacket sendExitRoom(String name) {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+        pkg.writeType(eGameRoom.EXIT_ROOM.getValue());
+        pkg.writeData("name", name);
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
+        return pkg;
+    }
+
+    @Override
+    public GamePacket sendChat(String message, String data, boolean isSystem){
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+        pkg.writeType(eGameRoom.CHAT.getValue());
+        pkg.writeData("message", message);
+        pkg.writeData("isSystem", isSystem);
+        pkg.writeData("data", data);
         pkg.serialize();
         this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
         return pkg;

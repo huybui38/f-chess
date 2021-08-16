@@ -31,6 +31,12 @@ public class GameRoomHandler  implements IPacketHandler{
                 }
                 GameRoomManager.addRoom(client);
                 break;
+            case CHAT:
+                if (client.currentBaseGameRoom == null){
+                    return;
+                }
+                client.Out().sendChat(dataPackage.getData().toString(), client.playerInfo.getUserID(), false);
+                break;
             case SELECT_TEAM:
                 int team =  Integer.parseInt(dataPackage.getData().toString());
                 if (client.currentBaseGameRoom == null){
@@ -61,11 +67,25 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.START_GAME.NOT_ENOUGH_PLAYER");
                     return;
                 }
+                if (client.currentBaseGameRoom.isPlaying()){
+                    client.Out().sendMessage("GAME_ROOM.START_GAME.ALREADY_STARTED");
+                    return;
+                }
                 client.currentBaseGameRoom.startGame();
                 GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
                 pkg.writeType(eGameRoom.START_GAME.getValue());
                 pkg.serialize();
                 client.Out().sendToAllInRoom(pkg, client.currentBaseGameRoom.getRoomID());
+                break;
+            case EXIT_ROOM:
+                if (client.currentBaseGameRoom == null){
+                    return;
+                }
+                if (client.gamePlayer.isViewer() == false){
+                    client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
+                }
+                client.Out().sendExitRoom(client.playerInfo.getUserID());
+                client.currentBaseGameRoom.removePlayer(client);
                 break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());

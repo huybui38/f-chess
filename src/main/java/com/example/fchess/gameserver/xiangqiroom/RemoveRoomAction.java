@@ -16,6 +16,7 @@ public class RemoveRoomAction implements Runnable{
             log.error("Remove Room: not found roomID "+ game.getRoomID());
         }
         int index = Integer.parseInt(game.getRoomID().split("_")[1]);
+        GameRoomManager.addFreeRoom(index);
         GameRoomManager.rooms.remove(game.getRoomID());
         log.debug("Removed gameroomID: {}", game.getRoomID());
     }

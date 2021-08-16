@@ -28,7 +28,9 @@ public abstract class BaseGameRoom {
     public boolean isPlaying() {
         return isPlaying;
     }
-
+    public int getTotalPlayers(){
+        return players.size();
+    }
     public void setPlaying(boolean playing) {
         isPlaying = playing;
     }
@@ -38,6 +40,11 @@ public abstract class BaseGameRoom {
     public abstract void onAddPlayerToSlot(GameClient client, int slot);
     public abstract void onGameData(GameClient client, GameDataPackage data);
     public abstract void startGame();
+    public abstract void endGame(int teamWin);
+
+    public void resetRoom(){
+        this.isPlaying = false;
+    }
 
 
 
