@@ -57,7 +57,7 @@ public class XiangqiBoard extends AbstractBoard {
         return true;
     }
 
-<<<<<<< HEAD
+
     @Override
     public boolean canEndGame() {
         return false;
@@ -78,7 +78,7 @@ public class XiangqiBoard extends AbstractBoard {
     public XiangqiBoard(String fen) {
         setCurrentPosition(fen);
         convertFenToXiangqiBoard(currentPosition);
-=======
+    }
 /*
       a b c d e f g h i
     0 R N B A K A B N R
@@ -92,10 +92,10 @@ public class XiangqiBoard extends AbstractBoard {
     8 . . . . . . . . .
     9 r n b a k a b n r
  */
-    protected XiangqiPiece[][] chessBoard;
+//    protected XiangqiPiece[][] chessBoard;
     protected char[][] displayBoard;
     protected char[] coordinates;
-    protected String currentPosition;//FEN
+//    protected String currentPosition;//FEN
     public XiangqiBoard(String fen, GameClient red, GameClient black) {
         this(red, black);
         setCurrentPosition(fen);
@@ -104,7 +104,7 @@ public class XiangqiBoard extends AbstractBoard {
         this.red = red;
         this.black =  black;
         initBoard();
->>>>>>> 33d0a3e25b2b68deeae3a3eb30ea4866f4a46df1
+
     }
 
     private boolean checkValidFen(String fen) {
@@ -122,13 +122,11 @@ public class XiangqiBoard extends AbstractBoard {
             System.out.print("Fen is invalid.");
             return;
         }
-<<<<<<< HEAD
 
         int index = 0, countEmpty = 1;
-=======
-        int index = 0;
+//        int index = 0;
         char charFen[] = fen.toCharArray();
->>>>>>> 33d0a3e25b2b68deeae3a3eb30ea4866f4a46df1
+
         for (int x = 0; x <= 9; x++) {
             for (int y = 0; y <= 8; y++) {
                 char charPiece = fen.charAt(index);
