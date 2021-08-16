@@ -57,6 +57,28 @@ public class XiangqiBoard extends AbstractBoard {
         return true;
     }
 
+<<<<<<< HEAD
+    @Override
+    public boolean canEndGame() {
+        return false;
+    }
+
+    @Override
+    public void initBoard() {
+        currentPosition = INITIAL_POSITION;
+    }
+
+    protected XiangqiPiece[][] chessBoard = new XiangqiPiece[11][10];
+
+    protected String currentPosition;//FEN
+    public XiangqiBoard(){
+        initBoard();
+        convertFenToXiangqiBoard(currentPosition);
+    }
+    public XiangqiBoard(String fen) {
+        setCurrentPosition(fen);
+        convertFenToXiangqiBoard(currentPosition);
+=======
 /*
       a b c d e f g h i
     0 R N B A K A B N R
@@ -82,6 +104,7 @@ public class XiangqiBoard extends AbstractBoard {
         this.red = red;
         this.black =  black;
         initBoard();
+>>>>>>> 33d0a3e25b2b68deeae3a3eb30ea4866f4a46df1
     }
 
     private boolean checkValidFen(String fen) {
@@ -90,30 +113,50 @@ public class XiangqiBoard extends AbstractBoard {
 
     public void addPiece(XiangqiPiece piece, int x, int y) {
         chessBoard[x][y] = piece;
+        piece.setCoordinatesX(x);
+        piece.setCoordinatesY(y);
+        piece.setChessBoard(this);
     }
     private void convertFenToXiangqiBoard(String fen) {
         if (!checkValidFen(fen)) {
             System.out.print("Fen is invalid.");
             return;
         }
+<<<<<<< HEAD
+
+        int index = 0, countEmpty = 1;
+=======
         int index = 0;
         char charFen[] = fen.toCharArray();
+>>>>>>> 33d0a3e25b2b68deeae3a3eb30ea4866f4a46df1
         for (int x = 0; x <= 9; x++) {
             for (int y = 0; y <= 8; y++) {
-                if (charFen[index] > 'a') {
-
+                char charPiece = fen.charAt(index);
+                if ((charPiece >= 'a' && charPiece <= 'z') || (charPiece >= 'A' && charPiece <= 'Z')) {
+                   XiangqiPiece piece = new XiangqiPiece().getPieceByCharFen(charPiece);
+                   this.addPiece(piece, 9 - x, y);
+                   index++;
                 }
+
+                if (charPiece >= '1' && charPiece <= '9') {
+                    if (countEmpty == (int) charPiece - 48) {
+                        index++;
+                        countEmpty = 1;
+                    } else countEmpty++;
+                }
+                if (y == 8) index ++;
             }
         }
     }
 
-    @Override
-    public boolean canEndGame() {
-        return false;
-    }
-
-    @Override
-    public void initBoard() {
-        currentPosition = INITIAL_POSITION;
+    public void showChessBoard() {
+        for (int x = 9; x >= 0; x--){
+            for (int y = 0; y <= 8; y++){
+                if (chessBoard[x][y] != null) {
+                    System.out.print(chessBoard[x][y].getLabel() + " ");
+                } else System.out.print('.' + " ");
+            }
+            System.out.println();
+        }
     }
 }
