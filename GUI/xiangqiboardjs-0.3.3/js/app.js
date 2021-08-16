@@ -23,11 +23,11 @@ function onDragStart(source, piece, position, orientation) {
   console.log("Position: " + Xiangqiboard.objToFen(position) +  "--" + JSON.stringify(position));
   console.log("Orientation: " + orientation);
   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
 }
 function onDrop(source, target, piece, newPos, oldPos, orientation){
     window.socket.emit("gameData", produceEvent(gameEvent.gameData,{
-        newPosition:Xiangqiboard.objToFen(newPos)
+        source,
+        target
     }));
     return 'snapback';
 }
@@ -47,6 +47,7 @@ const config = {
   dropOffBoard: "snapback",
   position: "start",
   onChange: onChange,
+  showNotation: true,
   onDragStart: onDragStart,
   onDrop:onDrop
 };

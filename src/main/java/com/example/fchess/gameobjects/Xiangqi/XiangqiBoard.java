@@ -42,13 +42,19 @@ public class XiangqiBoard extends AbstractBoard {
     }
 
     @Override
-    public void onReceiveGameData(String newPosition) {
+    public boolean onReceiveGameData(String source, String destination) {
         /*
         if this moving is valid then toggle turn
          */
-        currentPosition = newPosition;
+        if (source.length() != 2){
+            return false;
+        }
+//        if (turn == 1 && board[source].matches("^r")){
+//
+//        }
+        log.debug(source, destination);
         turn = 1 - turn;
-        log.debug(newPosition);
+        return true;
     }
 
 /*

@@ -31,7 +31,8 @@ public class GameDataHandler implements IPacketHandler {
         switch (packageType){
             case GAME_DATA:
                 GameDataPackage gameData = new GameDataPackage();
-                gameData.setNewPosition((String) ((LinkedHashMap)dataPackage.getData()).get("newPosition"));
+                gameData.setSource((String) ((LinkedHashMap)dataPackage.getData()).get("source"));
+                gameData.setTarget((String) ((LinkedHashMap)dataPackage.getData()).get("target"));
                 client.currentBaseGameRoom.onGameData(client, gameData);
                 break;
             default:

@@ -36,7 +36,7 @@ public class XiangqiGameRoom extends BaseGameRoom {
     }
     @Override
     public void onPlayerClosed(GameClient client) {
-        if (this.isPlayerReady(client)){
+        if (this.isPlayerReady(client) && this.isPlaying == false){
             this.removePlayerByClient(client);
         }
     }
@@ -57,8 +57,10 @@ public class XiangqiGameRoom extends BaseGameRoom {
     public void onGameData(GameClient client, GameDataPackage data) {
         if (game.getCurrentTurn() != client.gamePlayer.getTeam())
             return;
-        game.onReceiveGameData(data.getNewPosition());
-        client.Out().sendGameDataBoard(data.getNewPosition(), game.getCurrentTurn());
+        boolean result = game.onReceiveGameData(data.getSource(), data.getTarget());
+        if (result){
+            client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
+        }
     }
 
     @Override
