@@ -71,6 +71,16 @@ public class GameRoomHandler  implements IPacketHandler{
                 pkg.serialize();
                 client.Out().sendToAllInRoom(pkg, client.currentBaseGameRoom.getRoomID());
                 break;
+            case EXIT_ROOM:
+                if (client.currentBaseGameRoom == null){
+                    return;
+                }
+                if (client.gamePlayer.isViewer() == false){
+                    client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
+                }
+                client.currentBaseGameRoom.removePlayer(client);
+                client.Out().sendExitRoom(client.playerInfo.getUserID());
+                break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());
                 break;

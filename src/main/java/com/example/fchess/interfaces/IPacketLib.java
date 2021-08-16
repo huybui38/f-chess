@@ -10,4 +10,6 @@ public interface IPacketLib {
     void sendPlayerSlots(BaseGameRoom room);
     GamePacket sendInfoChessRoom(XiangqiGameRoom room);
     GamePacket sendGameDataBoard(String position, int turn);
+    GamePacket sendEndGame(String winnerName);
+    GamePacket sendExitRoom(String name);
 }

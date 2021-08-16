@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XiangqiGameRoom extends BaseGameRoom {
+    public static final int RED = 0;
+    public static final int BLACK = 1;
     private final Logger log = LoggerFactory.getLogger(XiangqiGameRoom.class);
 
     public XiangqiBoard getGame() {
@@ -72,5 +74,25 @@ public class XiangqiGameRoom extends BaseGameRoom {
             return;
         }
         log.error("startGame: not enough players");
+    }
+
+    @Override
+    public void endGame(int teamWin) {
+        if (this.isPlaying() || teamWin < 2 || teamWin >= 0){
+            this.slots[teamWin].gamePlayer.setWin(true);
+            this.slots[teamWin].gamePlayer.onWinning();
+            this.slots[1-teamWin].gamePlayer.setWin(false);
+            this.slots[1-teamWin].gamePlayer.onLosing();
+            this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getUserID());
+            resetRoom();
+        }
+    }
+
+    @Override
+    public void resetRoom() {
+        super.resetRoom();
+        removePlayerBySlot(XiangqiGameRoom.RED);
+        removePlayerBySlot(XiangqiGameRoom.BLACK);
+        game = null;
     }
 }
