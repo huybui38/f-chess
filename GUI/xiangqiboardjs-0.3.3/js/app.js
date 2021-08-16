@@ -149,7 +149,7 @@ function output(message) {
  function sendStartGame(socket){
     socket.emit("gameRoom", produceEvent(roomEvent.startGame));
  }
-let currentRoom = null
+let currentRoom = null;
 function onReady() {
   let userID = localStorage.getItem("token");
   if (!userID) {

@@ -61,6 +61,10 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.START_GAME.NOT_ENOUGH_PLAYER");
                     return;
                 }
+                if (client.currentBaseGameRoom.isPlaying()){
+                    client.Out().sendMessage("GAME_ROOM.START_GAME.ALREADY_STARTED");
+                    return;
+                }
                 client.currentBaseGameRoom.startGame();
                 GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
                 pkg.writeType(eGameRoom.START_GAME.getValue());
