@@ -43,13 +43,20 @@ public class XiangqiBoard extends AbstractBoard {
     }
 
     @Override
-    public void onReceiveGameData(String newPosition) {
+    public boolean onReceiveGameData(String source, String destination) {
         /*
         if this moving is valid then toggle turn
          */
-        currentPosition = newPosition;
+        if (source.length() != 2){
+            return false;
+        }
+//        if (turn == 1 && board[source].matches("^r")){
+//
+//        }
+        log.debug("Huy Ngu {} {}", source, destination);
+        this.currentPosition = "r1bakab1r/9/1cn2cn2/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/9/RNBAKABR1";
         turn = 1 - turn;
-        log.debug(newPosition);
+        return true;
     }
 
     @Override
@@ -63,6 +70,16 @@ public class XiangqiBoard extends AbstractBoard {
     }
 
     protected String[][] chessBoard = new String[11][10];
+
+
+    public XiangqiBoard(){
+        initBoard();
+        convertFenToXiangqiBoard(currentPosition);
+    }
+    public XiangqiBoard(String fen) {
+        setCurrentPosition(fen);
+        convertFenToXiangqiBoard(currentPosition);
+    }
 
     public XiangqiBoard(String fen, GameClient red, GameClient black) {
         this(red, black);

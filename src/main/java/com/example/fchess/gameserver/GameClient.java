@@ -51,6 +51,7 @@ public class GameClient extends BaseClient {
             this.Out().sendJoinRoom(currentBaseGameRoom.getRoomID());
             this.getSocket().joinRoom(currentBaseGameRoom.getRoomID());
             currentBaseGameRoom.onPlayerReconnect(this);
+//            if (currentBaseGameRoom.isPlaying() && currentBaseGameRoom.isPlayerReady(this))
         }
     }
 
