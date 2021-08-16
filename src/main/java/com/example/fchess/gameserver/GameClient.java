@@ -2,22 +2,23 @@ package com.example.fchess.gameserver;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.example.fchess.gamebase.BaseClient;
-import com.example.fchess.gamepacket.PacketLib;
+import com.example.fchess.gamepacket.PacketClientLib;
 import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 
 public class GameClient extends BaseClient {
 
     public PlayerInfo playerInfo;
+    public GamePlayer gamePlayer;
     public BaseGameRoom currentBaseGameRoom;
-    private PacketLib out;
-    public PacketLib Out(){
+    private PacketClientLib out;
+    public PacketClientLib Out(){
         return out;
     }
-
     public GameClient(SocketIOClient socket, String userID) {
         super(socket, userID);
         LoadFromDatabase();
-        out = new PacketLib(this);
+        out = new PacketClientLib(this);
+        gamePlayer = new GamePlayer();
     }
     private void LoadFromDatabase(){
         playerInfo = new PlayerInfo(userID);
@@ -53,9 +54,6 @@ public class GameClient extends BaseClient {
         }
     }
 
-    @Override
-    public void setSocket(SocketIOClient socket) {
-        super.setSocket(socket);
-    }
+
 
 }

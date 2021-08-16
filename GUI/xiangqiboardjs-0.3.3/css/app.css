@@ -18,7 +18,9 @@
 .connect-msg {
     color: green;
 }
-
+.current{
+ border-color: red !important;
+}
 .disconnect-msg {
     color: red;
 }

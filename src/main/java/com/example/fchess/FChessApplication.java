@@ -4,9 +4,11 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.example.fchess.gameobjects.Xiangqi.XiangqiBoard;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 
 @SpringBootApplication
 public class FChessApplication {
@@ -17,6 +19,7 @@ public class FChessApplication {
     private Integer port;
 
     @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public SocketIOServer socketIOServer() {
         Configuration config = new Configuration();
         config.setHostname(host);
