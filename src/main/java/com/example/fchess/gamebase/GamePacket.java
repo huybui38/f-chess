@@ -45,6 +45,10 @@ public class GamePacket implements IGamePacket {
         return true;
     }
 
+    public boolean writeType(Object type){
+        return this.writeData("type", type);
+    }
+
     @Override
     public void serialize() {
         this.data = mapper.convertValue(map, Object.class);

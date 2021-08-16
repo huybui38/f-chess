@@ -9,11 +9,14 @@
     <link rel="stylesheet" href="css/xiangqiboard-0.3.3.css" />
     <link rel="stylesheet" href="css/app.css" />
     <script src="node_modules/jquery/dist/jquery.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
     <script src="js/app.js"></script>
+    <script src="js/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
   </head>
 
   <body>
+    
     <img
       src="img/xiangqipieces/wikipedia/rK.svg"
       alt=""
@@ -25,26 +28,42 @@
         <div>
             Current UserID: <span id="userID"></span>
         </div>
-        <div>
+        <div id="roomDetail">
             Current Room:<span id="currentRoom"></span>
         </div>
         <div id="wait">Wait for another player....</div>
-        <div>
-          <input placeholder="Room ID" id="roomID" />
-          <button id="btnJoinRoom">Join Room</button>
+        <div id="joinedSection">
+            <div id="console" class="well"></div>
+            <div class="choose-team">
+                <div class="team" id="red">
+                    Red <span class="label-selected"></span>
+                </div>
+                <div class="team" id="black">black <span class="label-selected"></span></div>
+            </div>
+            <button id="btnStartGame">Start game</button>
+
+            <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100vw;
+            "
+          >
+            <div id="myBoard" style="width: 450px"></div>
+          </div>
         </div>
+        <div id="unJoinedSection">
+            <div>
+                <input placeholder="Room ID" id="roomID" />
+                <button id="btnJoinRoom">Join Room By ID</button>
+              </div>
+              <button id="btnCreate">Quick Create</button>
+        </div>
+        
     </div>
    
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-      "
-    >
-      <div id="myBoard" style="width: 450px"></div>
-    </div>
+   
 
     <script src="js/xiangqiboard-0.3.3.js"></script>
     <script>

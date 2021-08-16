@@ -1,13 +1,16 @@
 package com.example.fchess.gamebase;
 
 import com.corundumstudio.socketio.HandshakeData;
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIONamespace;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.interfaces.IPacketHandler;
 import com.example.fchess.interfaces.PacketHandler;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +27,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Component
-public class SocketProcessor {
-    private static final Logger log = LoggerFactory.getLogger(SocketProcessor.class);
-    private final SocketIONamespace namespace;
+
+public abstract class BaseSocketServer {
+    private static final Logger log = LoggerFactory.getLogger(BaseSocketServer.class);
+    protected final SocketIONamespace namespace;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private HashMap<String, IPacketHandler> handlers;
-    private ConcurrentHashMap<String, BaseClient> clients;
-    @Autowired
-    public SocketProcessor(SocketIOServer server) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    protected HashMap<String, IPacketHandler> handlers;
+    protected ConcurrentHashMap<String, BaseClient> clients;
+    public BaseSocketServer(SocketIOServer server) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -46,7 +48,6 @@ public class SocketProcessor {
         this.namespace.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
         searchService();
-
     }
     private void searchService() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         ClassPathScanningCandidateComponentProvider scanner =
@@ -55,18 +56,13 @@ public class SocketProcessor {
         for (BeanDefinition bd : scanner.findCandidateComponents("com.example.fchess.packethandler")){
             IPacketHandler handler = (IPacketHandler) Class.forName(bd.getBeanClassName()).newInstance();
             PacketHandler ano = handler.getClass().getAnnotation(PacketHandler.class);
-            this.namespace.addEventListener(ano.packetName().getValue(), ano.dataType(), wrapperHandler(ano.packetName().getValue()));
+            this.namespace.addEventListener(ano.packetName().getValue(), ano.dataType(), packetDispatcher(ano.packetName().getValue()));
             registerHandler(ano.packetName().getValue(), handler);
         }
+
     }
-    private DataListener wrapperHandler(String packet){
-        return (client, data, ackRequest) -> {
-            String token  = client.getHandshakeData().getSingleUrlParam("token");
-            if (clients.containsKey(token)){
-                handlers.get(packet).handle((GameClient) clients.get(token), data);
-            }
-        };
-    }
+    protected abstract DataListener packetDispatcher(String packet);
+
 
     private void clearUnusedClient(){
         for(Map.Entry<String, BaseClient> entry : clients.entrySet()) {
@@ -90,18 +86,21 @@ public class SocketProcessor {
             BaseClient base = null;
             if (clients.containsKey(token)){
                 base = clients.get(token);
-                base.onReconnect();
                 base.socket.sendEvent("onconflict");
                 base.socket.disconnect();
                 base.setSocket(client);
+                base.onReconnect();
                 log.debug("Same client");
             }else{
-                base = new GameClient(client, token);
+                base = getNewClient(client, token);
             }
             clients.put(token, base);
             base.onConnected();
             log.info("Client[{}] - Connected to chat module through '{}'", token, handshakeData.getUrl());
         };
+    }
+    protected BaseClient getNewClient(SocketIOClient client, String token){
+        return new BaseClient(client, token);
     }
     private void registerHandler(String id, IPacketHandler handler){
         handlers.put(id, handler);
@@ -112,6 +111,7 @@ public class SocketProcessor {
             BaseClient base = clients.get(token);
             if ( base != null){
                 base.setDisconnectedAt(DateTime.now());
+                base.onClosed();
             }
             log.debug("Client[{}] - Disconnected from chat module.", token);
         };
