@@ -12,4 +12,5 @@ public interface IPacketLib {
     GamePacket sendGameDataBoard(String position, int turn);
     GamePacket sendEndGame(String winnerName);
     GamePacket sendExitRoom(String name);
+    GamePacket sendChat(String message, String data, boolean isSystem);
 }

@@ -95,9 +95,21 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
 
     @Override
     public GamePacket sendExitRoom(String name) {
-        GamePacket pkg = new GamePacket(eChessPackage.GAME_DATA);
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.EXIT_ROOM.getValue());
         pkg.writeData("name", name);
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
+        return pkg;
+    }
+
+    @Override
+    public GamePacket sendChat(String message, String data, boolean isSystem){
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+        pkg.writeType(eGameRoom.CHAT.getValue());
+        pkg.writeData("message", message);
+        pkg.writeData("isSystem", isSystem);
+        pkg.writeData("data", data);
         pkg.serialize();
         this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
         return pkg;

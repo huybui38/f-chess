@@ -71,6 +71,12 @@ public class GameRoomManager{
             @Override
             public void run() {
                 log.debug("Scanning unused room");
+                for (Map.Entry<String, BaseGameRoom> entry:
+                        rooms.entrySet()) {
+                     if (entry.getValue().getTotalPlayers() == 0){
+                         removeRoom(entry.getValue());
+                     }
+                }
             }
         };
     }

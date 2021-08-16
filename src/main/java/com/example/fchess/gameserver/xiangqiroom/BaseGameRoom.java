@@ -28,7 +28,9 @@ public abstract class BaseGameRoom {
     public boolean isPlaying() {
         return isPlaying;
     }
-
+    public int getTotalPlayers(){
+        return players.size();
+    }
     public void setPlaying(boolean playing) {
         isPlaying = playing;
     }

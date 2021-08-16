@@ -31,6 +31,12 @@ public class GameRoomHandler  implements IPacketHandler{
                 }
                 GameRoomManager.addRoom(client);
                 break;
+            case CHAT:
+                if (client.currentBaseGameRoom == null){
+                    return;
+                }
+                client.Out().sendChat(dataPackage.getData().toString(), client.playerInfo.getUserID(), false);
+                break;
             case SELECT_TEAM:
                 int team =  Integer.parseInt(dataPackage.getData().toString());
                 if (client.currentBaseGameRoom == null){
@@ -78,8 +84,8 @@ public class GameRoomHandler  implements IPacketHandler{
                 if (client.gamePlayer.isViewer() == false){
                     client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
                 }
-                client.currentBaseGameRoom.removePlayer(client);
                 client.Out().sendExitRoom(client.playerInfo.getUserID());
+                client.currentBaseGameRoom.removePlayer(client);
                 break;
             default:
                 log.error("GameRoomPackage Not Found: {}", dataPackage.getType());

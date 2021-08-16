@@ -103,7 +103,7 @@ function initGameRoomEvent(response){
                 let msg = getHashMessage(response.message).format(response.data);
                 output('<span class="connect-msg">'+msg+'</span>');
             }else {
-                output('<span class="username-msg">' + response.userName + ':</span> ' + response.message);
+                output('<span class="username-msg">' + response.data + ':</span> ' + response.message);
             }
             break;
         case roomEvent.startGame:
@@ -187,6 +187,10 @@ function output(message) {
  function sendExitRoom(socket){
     socket.emit("gameRoom", produceEvent(roomEvent.exitRoom));
     reset();
+ } 
+ function sendChat(socket){
+    let msg = $("#chat").val();
+    socket.emit("gameRoom", produceEvent(roomEvent.chat, msg));
  }
 let currentRoom = null;
 function onReady() {
@@ -215,6 +219,7 @@ function onReady() {
   $("#btnStartGame").on("click",() => sendStartGame(socket))
   $("#btnSurrender").on("click",() => sendSurrenderGame(socket))
   $("#btnExitRoom").on("click",() => sendExitRoom(socket))
+  $("#btnChat").on("click",() => sendChat(socket))
   window.board = Xiangqiboard("myBoard", config);
   window.socket = socket;
 }
