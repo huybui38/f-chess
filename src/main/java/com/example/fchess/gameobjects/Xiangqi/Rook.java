@@ -4,10 +4,6 @@ import com.example.fchess.enums.eTeam;
 
 public class Rook extends XiangqiPiece {
     public Rook(eTeam team) {
-        if (team == eTeam.RED) setLabel('R');
-            else setLabel('r');
-
-        setTeam(team);
     }
 
     @Override
