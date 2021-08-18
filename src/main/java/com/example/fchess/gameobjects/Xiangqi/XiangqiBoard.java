@@ -123,6 +123,7 @@ public class XiangqiBoard extends AbstractBoard {
         this.processor.put(eXiangqiNotion.ELEPHANT, new Elephant());
         this.processor.put(eXiangqiNotion.ADVISOR, new Advisor());
         this.processor.put(eXiangqiNotion.PAwN, new Pawn());
+        this.processor.put(eXiangqiNotion.KING, new King());
     }
 
     private boolean checkValidFen(String fen) {
