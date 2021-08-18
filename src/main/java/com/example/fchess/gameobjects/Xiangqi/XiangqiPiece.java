@@ -4,22 +4,14 @@ import com.example.fchess.enums.eTeam;
 import com.example.fchess.gameobjects.AbstractPiece;
 
 public abstract class XiangqiPiece extends AbstractPiece {
-    public int getTeam(char notation) {
+    public eTeam getTeam(char notation) {
         if (notation >= 'a' && notation <= 'z') {
-            return eTeam.BLACK.getLabel();
+            return eTeam.BLACK;
         } else if (notation >= 'A' && notation <= 'Z') {
-            return eTeam.RED.getLabel();
+            return eTeam.RED;
         }
 
-        return -1;
-    }
-
-    public int getCoordinateX(String coordinate) {
-        return coordinate.charAt(1) - 48;
-    }
-
-    public int getCoordinateY(String coordinate) {
-        return coordinate.charAt(0) - 97;
+        return eTeam.NULL;
     }
 
     public boolean isOnPalace(int x, int y, eTeam team) {
@@ -36,6 +28,17 @@ public abstract class XiangqiPiece extends AbstractPiece {
         return true;
     }
 
+    public boolean isMoveDiagonal(int fromRow, int fromColumn, int toRow, int toColumn) {
+        return (Math.abs((fromRow - toRow)) == Math.abs(fromColumn - toColumn));
+    }
+
+    public int getStepDiagonal(int fromRow, int fromColumn, int toRow, int toColumn) {
+        if (isMoveDiagonal(fromRow, fromColumn, toRow, toColumn)) {
+            return Math.abs(fromRow - toRow);
+        }
+        return 0;
+    }
+
     public boolean isOnChessBoard(int x, int y) {
         if (x < 0 || x > 9 || y < 0 || y > 8) return false;
         return true;
@@ -43,6 +46,12 @@ public abstract class XiangqiPiece extends AbstractPiece {
 
     public boolean isSameTeam(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
         return  (getTeam(chessBoard[fromRow][fromColumn]) == getTeam(chessBoard[toRow][toColumn]));
+    }
+
+    public boolean isLegalMove(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
+        if (!isOnChessBoard(fromRow, fromColumn) || !isOnChessBoard(toRow, toColumn)) return false;
+        if (isSameTeam(fromRow, fromColumn, toRow, toColumn, chessBoard)) return false;
+        return true;
     }
 
     abstract public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard);

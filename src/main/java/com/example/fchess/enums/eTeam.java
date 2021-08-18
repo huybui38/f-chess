@@ -3,6 +3,7 @@ package com.example.fchess.enums;
 public enum eTeam {
     RED(1),
     BLACK(0),
+    NULL(-1),
     ;
 
     public final int label;

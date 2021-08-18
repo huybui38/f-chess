@@ -87,7 +87,7 @@ public class XiangqiBoard extends AbstractBoard {
 
         eXiangqiNotion pieceEnum = eXiangqiNotion.fromNotation(chessBoard[fromX][fromY]);
         XiangqiPiece pieceProcessor = processor.get(pieceEnum);
-        int team = pieceProcessor.getTeam(chessBoard[fromX][fromY]);
+        int team = pieceProcessor.getTeam(chessBoard[fromX][fromY]).getLabel();
 
         if (turn == team) {
             log.debug("Not turn");
@@ -120,6 +120,7 @@ public class XiangqiBoard extends AbstractBoard {
         convertFenToXiangqiBoard(currentPosition);
         this.processor = new HashMap<>();
         this.processor.put(eXiangqiNotion.HORSE, new Horse());
+        this.processor.put(eXiangqiNotion.ELEPHANT, new Elephant());
     }
 
     private boolean checkValidFen(String fen) {
