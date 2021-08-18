@@ -26,13 +26,14 @@ public class Horse extends XiangqiPiece {
 
     @Override
     public boolean validateMove(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
-      if (this.isLegalMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) {
-          if (Math.abs(fromRow - toRow) == 2 && Math.abs(fromColumn - toColumn) == 1) {
-              return (chessBoard[(fromRow + toRow) / 2][fromColumn] == '.');
-          } else if (Math.abs(fromRow - toRow) == 1 && Math.abs((fromColumn - toColumn)) == 2) {
-              return (chessBoard[fromRow][(fromColumn + toColumn) / 2] == '.');
-          }
-      }
-      return false;
+        if (!isLegalMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) return false;
+
+        if (Math.abs(fromRow - toRow) == 2 && Math.abs(fromColumn - toColumn) == 1) {
+            return (chessBoard[(fromRow + toRow) / 2][fromColumn] == '.');
+        } else if (Math.abs(fromRow - toRow) == 1 && Math.abs((fromColumn - toColumn)) == 2) {
+            return (chessBoard[fromRow][(fromColumn + toColumn) / 2] == '.');
+        }
+
+        return false;
     }
 }

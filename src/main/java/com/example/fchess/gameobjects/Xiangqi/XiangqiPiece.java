@@ -38,6 +38,27 @@ public abstract class XiangqiPiece extends AbstractPiece {
         return 0;
     }
 
+    public int getNumberPiecesBetween(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
+        if (getStepStraight(fromRow, fromColumn, toRow, toColumn) < 2) return 0;
+        int count = 0, start, end;
+
+        if (fromRow == toRow) {
+            start = Math.min(fromColumn, toColumn);
+            end = Math.max(fromColumn, toColumn);
+            for (int col = start + 1 ; col < end; col++) {
+                if (chessBoard[fromRow][col] != '.') count++;
+            }
+        } else {
+            start = Math.min(fromRow, toRow);
+            end = Math.max(fromRow, toRow);
+            for (int row = start + 1 ; row < end; row++) {
+                if (chessBoard[row][fromColumn] != '.') count++;
+            }
+        }
+
+        return count;
+    }
+
     public boolean isMoveDiagonal(int fromRow, int fromColumn, int toRow, int toColumn) {
         return (Math.abs((fromRow - toRow)) == Math.abs(fromColumn - toColumn));
     }

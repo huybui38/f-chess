@@ -13,12 +13,13 @@ public class Advisor extends XiangqiPiece {
 
     @Override
     public boolean validateMove(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
-        if (this.isLegalMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) {
-            eTeam team =  getTeam(chessBoard[fromRow][fromColumn]);
-            if (isOnPalace(fromRow, fromColumn, team) && isOnPalace(toRow, toColumn, team)) {
-                return getStepDiagonal(fromRow, fromColumn, toRow, toColumn) == 1;
-            }
+        if (!isLegalMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) return false;
+
+        eTeam team = getTeam(chessBoard[fromRow][fromColumn]);
+        if (isOnPalace(fromRow, fromColumn, team) && isOnPalace(toRow, toColumn, team)) {
+            return getStepDiagonal(fromRow, fromColumn, toRow, toColumn) == 1;
         }
+
         return false;
     }
 }

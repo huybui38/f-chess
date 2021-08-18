@@ -2,8 +2,8 @@ package com.example.fchess.gameobjects.Xiangqi;
 
 import com.example.fchess.enums.eTeam;
 
-public class King extends XiangqiPiece {
-    public King() {
+public class Cannon extends XiangqiPiece{
+    public Cannon() {
     }
 
     @Override
@@ -14,12 +14,12 @@ public class King extends XiangqiPiece {
     @Override
     public boolean validateMove(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
         if (!isLegalMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) return false;
+        if (!isStraight(fromRow, fromColumn, toRow, toColumn)) return false;
 
-        eTeam team = getTeam(chessBoard[fromRow][fromColumn]);
-        if (isOnPalace(fromRow, fromColumn, team) && isOnPalace(toRow, toColumn, team)) {
-            return getStepStraight(fromRow, fromColumn, toRow, toColumn) == 1;
+        if (chessBoard[toRow][toColumn] == '.') {
+            return getNumberPiecesBetween(fromRow, fromColumn, toRow, toColumn, chessBoard) == 0;
+        } else {
+            return getNumberPiecesBetween(fromRow, fromColumn, toRow, toColumn, chessBoard) == 1;
         }
-
-        return false;
     }
 }

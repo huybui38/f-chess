@@ -124,6 +124,8 @@ public class XiangqiBoard extends AbstractBoard {
         this.processor.put(eXiangqiNotion.ADVISOR, new Advisor());
         this.processor.put(eXiangqiNotion.PAwN, new Pawn());
         this.processor.put(eXiangqiNotion.KING, new King());
+        this.processor.put(eXiangqiNotion.CANNON, new Cannon());
+        this.processor.put(eXiangqiNotion.ROOK, new Rook());
     }
 
     private boolean checkValidFen(String fen) {
