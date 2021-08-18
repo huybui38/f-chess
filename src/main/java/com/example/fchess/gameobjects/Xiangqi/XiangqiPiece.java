@@ -28,6 +28,16 @@ public abstract class XiangqiPiece extends AbstractPiece {
         return true;
     }
 
+    public boolean isStraight(int fromRow, int fromColumn, int toRow, int toColumn) {
+        return fromRow == toRow || fromColumn == toColumn;
+    }
+
+    public int getStepStraight(int fromRow, int fromColumn, int toRow, int toColumn) {
+        if (fromRow == toRow) return Math.abs(fromColumn - toColumn);
+        if (fromColumn == toColumn) return Math.abs(fromRow - toRow);
+        return 0;
+    }
+
     public boolean isMoveDiagonal(int fromRow, int fromColumn, int toRow, int toColumn) {
         return (Math.abs((fromRow - toRow)) == Math.abs(fromColumn - toColumn));
     }
