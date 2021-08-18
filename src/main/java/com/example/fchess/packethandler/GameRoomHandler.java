@@ -71,7 +71,11 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.START_GAME.ALREADY_STARTED");
                     return;
                 }
-                client.currentBaseGameRoom.startGame();
+                int time =Integer.parseInt(dataPackage.getData().toString());
+                if (time <= 30){
+                    return;
+                }
+                client.currentBaseGameRoom.startGame(time);
                 GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
                 pkg.writeType(eGameRoom.START_GAME.getValue());
                 pkg.serialize();

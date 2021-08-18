@@ -179,7 +179,8 @@ function output(message) {
     window.board.orientation(getTeamName(team));
  }
  function sendStartGame(socket){
-    socket.emit("gameRoom", produceEvent(roomEvent.startGame));
+    let time = $("#time").val();
+    socket.emit("gameRoom", produceEvent(roomEvent.startGame, time));
  }
  function sendSurrenderGame(socket){
     socket.emit("gameData", produceEvent(gameEvent.gameSurrender));
