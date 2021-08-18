@@ -100,6 +100,7 @@ public class XiangqiBoard extends AbstractBoard {
     public void addPiece(String piece, int x, int y) {
         chessBoard[x][y] = piece;
     }
+
     private void convertFenToXiangqiBoard(String fen) {
         if (!checkValidFen(fen)) {
             System.out.print("Fen is invalid.");
