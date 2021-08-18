@@ -1,13 +1,36 @@
 package com.example.fchess.gameobjects.Xiangqi;
 
+import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
-public class Cannon extends XiangqiPiece{
+public class Cannon extends XiangqiPiece {
+    private static final int[] dx = {0, 0, -1, 1};
+    private static final int[] dy = {-1, 1, 0, 0};
+
     public Cannon() {
     }
 
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
+        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
+
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_CANNON : ePieceNotation.BLACK_CANNON;
+
+        for (int i = 0; i < 4; i++) {
+            int fromRow = toRow + dx[i];
+            int fromColumn = toColumn + dy[i];
+            int count = 0;
+            while (isOnChessBoard(fromRow, fromColumn)) {
+                if (chessBoard[fromRow][fromColumn] == pieceEnum.getNotation()) {
+                    if (count == 1) return true;
+                        else break;
+                };
+
+                if (chessBoard[fromRow][fromColumn] != '.') count++;
+                fromRow = toRow + dx[i];
+                fromColumn = toColumn + dy[i];
+            }
+        }
         return false;
     }
 

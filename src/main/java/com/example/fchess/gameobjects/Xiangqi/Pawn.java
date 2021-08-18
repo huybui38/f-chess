@@ -1,10 +1,27 @@
 package com.example.fchess.gameobjects.Xiangqi;
 
+import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
 public class Pawn extends XiangqiPiece {
+    private static final int[][] dx = {{0, 0},{0, 0},{-1, 1}};
+    private static final int[][] dy = {{-1, -1}, {1, 1}, {0, 0}};
+
+    public Pawn() {
+    }
+
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
+        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_PAWN : ePieceNotation.BLACK_PAWN;
+
+        for (int i = 0; i < 4; i++) {
+            int fromRow = toRow + dx[team.getLabel()][i];
+            int fromColumn = toColumn + dy[team.getLabel()][i];
+            if (isOnChessBoard(fromRow, fromColumn) && chessBoard[fromRow][fromColumn] == pieceEnum.getNotation()) {
+                if (this.validateMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) return true;
+            }
+        }
         return false;
     }
 

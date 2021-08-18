@@ -12,13 +12,14 @@ public class Horse extends XiangqiPiece {
 
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
-        char pieceNotation = team == eTeam.RED ? ePieceNotation.RED_HORSE.getNotation() : ePieceNotation.BLACK_HORSE.getNotation();
+        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_HORSE : ePieceNotation.BLACK_HORSE;
 
         for (int i = 0; i < 8; i++) {
-            int fromX = toRow + dx[i];
-            int fromY = toColumn + dy[i];
-            if (this.isOnChessBoard(fromX, fromY) && chessBoard[fromX][fromY] == pieceNotation) {
-                if (validateMove(fromX, fromY, toRow, toColumn, chessBoard)) return true;
+            int fromRow = toRow + dx[i];
+            int fromColumn = toColumn + dy[i];
+            if (isOnChessBoard(fromRow, fromColumn) && chessBoard[fromRow][fromColumn] == pieceEnum.getNotation()) {
+                if (this.validateMove(fromRow, fromColumn, toRow, toColumn, chessBoard)) return true;
             }
         }
         return false;
