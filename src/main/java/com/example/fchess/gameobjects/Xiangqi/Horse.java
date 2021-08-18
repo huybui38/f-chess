@@ -3,62 +3,38 @@ package com.example.fchess.gameobjects.Xiangqi;
 import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
-public class Horse extends  XiangqiPiece{
+public class Horse extends XiangqiPiece {
     private static final int[] dx = {-2, -2, -1, -1, 1, 1, 2, 2};
     private static final int[] dy = {-1, 1, -2, 2, -2, 2, -1, 1};
 
+    public Horse() {
+    }
+
     @Override
-    public boolean isCapture(String source, String destination) {
-//        int xBeCapture = this.getCoordinateX(destination);
-//        int yBeCapture = this.getCoordinateY(destination);
-//        int team = this.getTeam(chessBoard[xBeCapture][yBeCapture]);
-//        char notationPiece;
-//
-//        if (eTeam.RED.getLabel() == team) {
-//            notationPiece = ePieceNotation.BLACK_HORSE.getNotation();
-//        } else notationPiece = ePieceNotation.RED_HORSE.getNotation();
-//
-//        for (int i = 0; i < 8; i++) {
-//            int xSource = xBeCapture + dx[i];
-//            int ySource = yBeCapture + dy[i];
-//            if (this.isOnChessBoard(xSource, ySource) && chessBoard[xSource][ySource] == notationPiece) {
-//
-//            }
-//        }
-//        return true;
+    public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
+        char pieceNotation = team == eTeam.RED ? ePieceNotation.RED_HORSE.getNotation() : ePieceNotation.BLACK_HORSE.getNotation();
+
+        for (int i = 0; i < 8; i++) {
+            int fromX = toRow + dx[i];
+            int fromY = toColumn + dy[i];
+            if (this.isOnChessBoard(fromX, fromY) && chessBoard[fromX][fromY] == pieceNotation) {
+                if (validateMove(fromX, fromY, toRow, toColumn, chessBoard)) return true;
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean validateMove(String source, String destination) {
-        int xSource = this.getCoordinateX(source);
-        int ySource = this.getCoordinateY(source);
-        int xTarget = this.getCoordinateX(destination);
-        int yTarget = this.getCoordinateY(destination);
+    public boolean validateMove(int fromRow, int fromColumn, int toRow, int toColumn, char[][] chessBoard) {
+        if (this.isSameTeam(fromRow, fromColumn, toRow, toColumn, chessBoard)) return false;
+        if (this.isOnChessBoard(toRow, toColumn))
 
-        for (int i = 0; i < 8; i++) {
-            int xGo = xSource + dx[i];
-            int yGo = ySource + dy[i];
-            if (this.isOnChessBoard(xGo, yGo) && xGo == xTarget && yGo == yTarget) {
-                // Check clean path
-                if (this.getDiffX(source, destination) == -2) {
-                    if (chessBoard[xSource + 1][ySource] == '.')
-                        return true;
-                }
-                if (this.getDiffX(source, destination) == 2) {
-                    if (chessBoard[xSource - 1][ySource - 1] == '.')
-                        return true;
-                }
-                if (this.getDiffY(source, destination) == -2) {
-                    if (chessBoard[xSource][ySource + 1] == '.')
-                        return true;
-                }
-                if (this.getDiffY(source, destination) == 2) {
-                    if (chessBoard[xSource][ySource - 1] == '.')
-                        return true;
-                }
+            if (Math.abs(fromRow - toRow) == 2 && Math.abs(fromColumn - toColumn) == 1) {
+                return (chessBoard[(fromRow + toRow) / 2][fromColumn] == '.');
+            } else if (Math.abs(fromRow - toRow) == 1 && Math.abs((fromColumn - toColumn)) == 2) {
+                return (chessBoard[fromRow][(fromColumn + toColumn) / 2] == '.');
             }
-        }
+
         return false;
     }
 }

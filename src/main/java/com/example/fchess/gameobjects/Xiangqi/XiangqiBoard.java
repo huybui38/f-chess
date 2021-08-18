@@ -1,6 +1,7 @@
 package com.example.fchess.gameobjects.Xiangqi;
 
 import com.example.fchess.enums.ePieceNotation;
+import com.example.fchess.enums.eTeam;
 import com.example.fchess.enums.eXiangqiNotion;
 import com.example.fchess.gameobjects.AbstractBoard;
 import com.example.fchess.gameobjects.AbstractPiece;
@@ -60,6 +61,14 @@ public class XiangqiBoard extends AbstractBoard {
 
     }
 
+    public int getCoordinateX(String coordinate) {
+        return coordinate.charAt(1) - 48;
+    }
+
+    public int getCoordinateY(String coordinate) {
+        return coordinate.charAt(0) - 97;
+    }
+
     @Override
     public boolean onReceiveGameData(String source, String destination) {
         /*
@@ -68,10 +77,32 @@ public class XiangqiBoard extends AbstractBoard {
         if (source.length() != 2) {
             return false;
         }
-//        if (turn == 1 && board[source].matches("^r")){
-//
-//        }
-        log.debug("Huy Ngu {} {}", source, destination);
+        log.debug("From: {} , To: {}", source, destination);
+
+        int fromX = getCoordinateX(source);
+        int fromY = getCoordinateY(source);
+        int toX = getCoordinateX(destination);
+        int toY = getCoordinateY(destination);
+        log.debug("Coordinate: x1={},y1={}  ;  x2={},y2={}", fromX, fromY, toX, toY);
+
+        eXiangqiNotion pieceEnum = eXiangqiNotion.fromNotation(chessBoard[fromX][fromY]);
+        XiangqiPiece pieceProcessor = processor.get(pieceEnum);
+        int team = pieceProcessor.getTeam(chessBoard[fromX][fromY]);
+
+        if (turn == team) {
+            log.debug("Not turn");
+            return false;
+        }
+
+        boolean validateMove = pieceProcessor.validateMove(fromX, fromY, toX, toY, chessBoard);
+        if (!validateMove) {
+            log.debug("Invalid move");
+            return false;
+        }
+
+        addPiece(chessBoard[fromX][fromY], toX, toY);
+        removePiece(fromX, fromY);
+        currentPosition = convertBoardToFen(chessBoard);
         turn = 1 - turn;
         return true;
     }
@@ -87,6 +118,8 @@ public class XiangqiBoard extends AbstractBoard {
         this.black = black;
         initBoard();
         convertFenToXiangqiBoard(currentPosition);
+        this.processor = new HashMap<>();
+        this.processor.put(eXiangqiNotion.HORSE, new Horse());
     }
 
     private boolean checkValidFen(String fen) {
@@ -129,6 +162,26 @@ public class XiangqiBoard extends AbstractBoard {
         }
     }
 
+    private String convertBoardToFen(char[][] board) {
+        String result = "";
+        for (int x = 9; x >= 0; x--) {
+            int count = 0;
+            for (int y = 0; y <= 8; y++) {
+                if (board[x][y] == '.') {
+                    count++;
+                } else {
+                    if (count != 0) result += count;
+                    result += board[x][y];
+                    count = 0;
+                }
+            }
+            if (count != 0) result += count;
+            if (x != 0) result += '/';
+        }
+
+        return result;
+    }
+
     public void showChessBoard() {
         for (int x = 9; x >= 0; x--) {
             for (int y = 0; y <= 8; y++) {
@@ -136,6 +189,7 @@ public class XiangqiBoard extends AbstractBoard {
             }
             System.out.println();
         }
+        System.out.println(convertBoardToFen(chessBoard));
     }
 
     @Override

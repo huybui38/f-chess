@@ -32,7 +32,6 @@ public class FChessApplication {
     public static void main(String[] args) {
         SpringApplication.run(FChessApplication.class, args);
         //TEST HERE
-        System.out.println(eGameRoom.fromId(1));
         XiangqiBoard chessBoard = new XiangqiBoard("r1bakab1r/9/1cn2cn2/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/9/RNBAKABR1", null, null);
         chessBoard.showChessBoard();
         //
