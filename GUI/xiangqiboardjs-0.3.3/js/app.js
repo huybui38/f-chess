@@ -60,6 +60,15 @@ function initEvent(socket){
     socket.on("gameData", initGameDataEvent)
     socket.on("notify", (response) => alert(response.msg));
 }
+function toggleTurn(turn){
+    if (turn === TEAM.RED){
+        $("#red").toggleClass("current", true);
+        $("#black").toggleClass("current", false);
+    }else {
+        $("#red").toggleClass("current", false);
+        $("#black").toggleClass("current", true);
+    }
+}
 function initGameDataEvent(response){
     console.log(response);
     switch (response.type) {
@@ -67,14 +76,13 @@ function initGameDataEvent(response){
             let pos = response.position;
             let turn = response.turn;
             console.log(`pos:${pos} - turn: ${turn}`);
-            if (turn === TEAM.RED){
-                $("#red").toggleClass("current", true);
-                $("#black").toggleClass("current", false);
-            }else {
-                $("#red").toggleClass("current", false);
-                $("#black").toggleClass("current", true);
-            }
+            toggleTurn(turn);
             window.board.position(pos, true);
+            break;
+        case gameEvent.gameSurrender:
+            break;
+        case gameEvent.gameEnd:
+            alert("Winner: "+ response.winnerName);
             break;
     }
 }
@@ -95,11 +103,12 @@ function initGameRoomEvent(response){
                 let msg = getHashMessage(response.message).format(response.data);
                 output('<span class="connect-msg">'+msg+'</span>');
             }else {
-                output('<span class="username-msg">' + response.userName + ':</span> ' + response.message);
+                output('<span class="username-msg">' + response.data + ':</span> ' + response.message);
             }
             break;
         case roomEvent.startGame:
             console.log("game start...")
+            toggleTurn(TEAM.RED);
             $("#myBoard").show();
             break;
         case roomEvent.selectTeam:
@@ -114,12 +123,22 @@ function initGameRoomEvent(response){
             $(`#black  > span`).show();
             if (response.isPlaying){
                 $("#myBoard").show();
-                window.board.position(response.position, true);
+                toggleTurn(response.turn);
+                window.board.position(response.currentPosition, true);
+                if (!response.isViewer){
+                    window.board.orientation(getTeamName(response.team));
+                }
             }
+            break;
+        case roomEvent.exitRoom:
+            output('<span class="connect-msg">'+response.name+' exited</span>');
             break;
         default:
             break;
     }
+}
+function getTeamName(team){
+    return team === 0 ? 'red' : 'black'
 }
 const roomEvent = {
     joinRoom:1,
@@ -127,16 +146,28 @@ const roomEvent = {
     chat:3,
     selectTeam:4,
     roomInfo:5,
-    startGame:6
+    startGame:6,
+    resetRoom:7,
+    exitRoom:8
 }
 const gameEvent = {
-    gameData:0
+    gameData:0,
+    gameSurrender:3,
+    gameEnd:4
 }
 function produceEvent(eventType, data){
     return {
         type:eventType,
         data
     }
+}
+function reset(){
+    $("#userID").html(userID);
+    $("#unJoinedSection").show();
+    $("#joinedSection").hide();
+    $("#wait").hide();
+    $("#roomDetail").hide();
+    $("#myBoard").hide();
 }
 function output(message) {
     var currentTime = "<span class='time'>" + moment().format('HH:mm:ss.SSS') + "</span>";
@@ -145,11 +176,24 @@ function output(message) {
  }
  function onSelectTeam(socket, team){
     socket.emit("gameRoom", produceEvent(roomEvent.selectTeam, team));
+    window.board.orientation(getTeamName(team));
  }
  function sendStartGame(socket){
-    socket.emit("gameRoom", produceEvent(roomEvent.startGame));
+    let time = $("#time").val();
+    socket.emit("gameRoom", produceEvent(roomEvent.startGame, time));
  }
-let currentRoom = null
+ function sendSurrenderGame(socket){
+    socket.emit("gameData", produceEvent(gameEvent.gameSurrender));
+ }
+ function sendExitRoom(socket){
+    socket.emit("gameRoom", produceEvent(roomEvent.exitRoom));
+    reset();
+ } 
+ function sendChat(socket){
+    let msg = $("#chat").val();
+    socket.emit("gameRoom", produceEvent(roomEvent.chat, msg));
+ }
+let currentRoom = null;
 function onReady() {
   let userID = localStorage.getItem("token");
   if (!userID) {
@@ -174,6 +218,9 @@ function onReady() {
   $("#red").on("click", () => onSelectTeam(socket, 0));
   $("#black").on("click", () => onSelectTeam(socket, 1));
   $("#btnStartGame").on("click",() => sendStartGame(socket))
+  $("#btnSurrender").on("click",() => sendSurrenderGame(socket))
+  $("#btnExitRoom").on("click",() => sendExitRoom(socket))
+  $("#btnChat").on("click",() => sendChat(socket))
   window.board = Xiangqiboard("myBoard", config);
   window.socket = socket;
 }

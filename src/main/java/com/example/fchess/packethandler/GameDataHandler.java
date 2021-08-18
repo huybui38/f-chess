@@ -35,6 +35,15 @@ public class GameDataHandler implements IPacketHandler {
                 gameData.setTarget((String) ((LinkedHashMap)dataPackage.getData()).get("target"));
                 client.currentBaseGameRoom.onGameData(client, gameData);
                 break;
+            case GAME_SURRENDER:
+                if ( client.currentBaseGameRoom.isPlaying() == false){
+                    return;
+                }
+                if (client.gamePlayer.isViewer()){
+                    return;
+                }
+                client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
+                break;
             default:
                 log.error("NOT FOUND eGameData:{}",packageType);
                 break;

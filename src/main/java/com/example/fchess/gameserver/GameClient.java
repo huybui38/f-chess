@@ -18,7 +18,7 @@ public class GameClient extends BaseClient {
         super(socket, userID);
         LoadFromDatabase();
         out = new PacketClientLib(this);
-        gamePlayer = new GamePlayer();
+        gamePlayer = new GamePlayer(userID);
     }
     private void LoadFromDatabase(){
         playerInfo = new PlayerInfo(userID);

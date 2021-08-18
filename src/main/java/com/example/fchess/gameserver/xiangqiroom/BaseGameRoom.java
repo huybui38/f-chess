@@ -5,7 +5,10 @@ import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.transmodel.GameDataPackage;
 
 import java.util.List;
+import java.util.Timer;
 import java.util.Vector;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 public abstract class BaseGameRoom {
 
@@ -19,6 +22,8 @@ public abstract class BaseGameRoom {
     }
 
     protected GameClient[] slots;
+    protected Future[] turnTimer;
+    protected ScheduledExecutorService turnService;
     public GameClient[] getSlots() {
         return slots;
     }
@@ -28,7 +33,9 @@ public abstract class BaseGameRoom {
     public boolean isPlaying() {
         return isPlaying;
     }
-
+    public int getTotalPlayers(){
+        return players.size();
+    }
     public void setPlaying(boolean playing) {
         isPlaying = playing;
     }
@@ -37,7 +44,12 @@ public abstract class BaseGameRoom {
     public abstract void onRemovePlayerFromSlot(GameClient client, int slot);
     public abstract void onAddPlayerToSlot(GameClient client, int slot);
     public abstract void onGameData(GameClient client, GameDataPackage data);
-    public abstract void startGame();
+    public abstract void startGame(int turnTime);
+    public abstract void endGame(int teamWin);
+
+    public void resetRoom(){
+        this.isPlaying = false;
+    }
 
 
 
