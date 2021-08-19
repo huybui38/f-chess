@@ -1,5 +1,6 @@
 package com.example.fchess.gameobjects.engine;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -650,4 +651,5 @@ public class XiangqiEngineV1 {
         }
         return nodes;
     }
+
 }

@@ -6,19 +6,30 @@ import com.example.fchess.transmodel.GameDataPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 public class XiangqiGameRoom extends BaseGameRoom {
     public static final int RED = 0;
     public static final int BLACK = 1;
+    public static final int DEFAULT_GAME_TIME = 180;
     private final Logger log = LoggerFactory.getLogger(XiangqiGameRoom.class);
-
+    private CountDownTurnAction[] turnActions = new CountDownTurnAction[2];
     public XiangqiBoard getGame() {
         return game;
     }
-
     private XiangqiBoard game;
+    private int turnTime;
     public XiangqiGameRoom(String roomID) {
         super(roomID);
         slots = new GameClient[2];
+        turnTimer = new Future[2];
+        turnTime = DEFAULT_GAME_TIME;
+        turnService = Executors.newScheduledThreadPool(1);
+        turnActions[XiangqiGameRoom.RED] = new CountDownTurnAction(DEFAULT_GAME_TIME, this, XiangqiGameRoom.RED);
+        turnActions[XiangqiGameRoom.BLACK] = new CountDownTurnAction(DEFAULT_GAME_TIME, this, XiangqiGameRoom.BLACK);
     }
     @Override
     public boolean canStartGame() {
@@ -61,6 +72,8 @@ public class XiangqiGameRoom extends BaseGameRoom {
             return;
         boolean result = game.onReceiveGameData(data.getSource(), data.getTarget());
         if (result){
+            stopTurnTimer(client.gamePlayer.getTeam());
+            startTurnTimer(game.getCurrentTurn());
             client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
             if (game.isCheckmated()){
                 endGame(client.gamePlayer.getTeam());
@@ -69,14 +82,35 @@ public class XiangqiGameRoom extends BaseGameRoom {
     }
 
     @Override
-    public void startGame() {
+    public void startGame(int turnTime) {
+
         if (this.ready == 2){
+            this.turnTime = turnTime;
+            resetTurnTimer();
             game = new XiangqiBoard(slots[0], slots[1]);
             game.startGame();
             this.isPlaying = true;
+            startTurnTimer(RED);
+//            startTurnTimer(BLACK);
             return;
         }
         log.error("startGame: not enough players");
+    }
+    private void startTurnTimer(int team){
+        turnTimer[team] = turnService.scheduleAtFixedRate(turnActions[team], 0, 1000, TimeUnit.MILLISECONDS);
+    }
+    private void stopTurnTimer(int team){
+        turnTimer[team].cancel(true);
+    }
+    private void resetTurnTimer(){
+        if (turnTimer[RED] != null && turnTimer[RED].isCancelled() == false){
+            turnTimer[RED].cancel(true);
+        }
+        if (turnTimer[BLACK] != null &&  turnTimer[BLACK].isCancelled() == false){
+            turnTimer[BLACK].cancel(true);
+        }
+        turnActions[XiangqiGameRoom.RED] = new CountDownTurnAction(turnTime, this, XiangqiGameRoom.RED);
+        turnActions[XiangqiGameRoom.BLACK] = new CountDownTurnAction(turnTime, this, XiangqiGameRoom.BLACK);
     }
 
     @Override
@@ -88,6 +122,7 @@ public class XiangqiGameRoom extends BaseGameRoom {
             this.slots[1-teamWin].gamePlayer.onLosing();
             this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getUserID());
             resetRoom();
+            resetTurnTimer();
         }
     }
 
