@@ -61,6 +61,9 @@ public abstract class BaseGameRoom {
         host = player;
         onHostChanged(player);
     }
+    public boolean isHost(GameClient player){
+        return host == player;
+    }
 
     public BaseGameRoom(String roomID) {
         this.ready = 0;

@@ -38,21 +38,23 @@ public class BaseClient extends AbstractBaseClient{
 
     @Override
     protected void onDisconnected() {
-
+        this.isConnected = false;
     }
 
     @Override
     protected void onConnected() {
         socket.sendEvent("connected", socket.getHandshakeData().getSingleUrlParam("token"));
+        this.isConnected = true;
     }
     @Override
     protected void onReconnect() {
         disconnectedAt = DateTime.now().plusDays(1);
+        this.isConnected = true;
     }
 
     @Override
     protected void onClosed() {
-        
+        this.isConnected = false;
     }
 
 }

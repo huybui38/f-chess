@@ -71,6 +71,10 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.START_GAME.ALREADY_STARTED");
                     return;
                 }
+                if (client.currentBaseGameRoom.isHost(client) == false){
+                    client.Out().sendMessage("GAME_ROOM.INVALID_HOST");
+                    return;
+                }
                 int time =Integer.parseInt(dataPackage.getData().toString());
                 if (time <= 30){
                     return;

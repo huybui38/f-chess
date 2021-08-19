@@ -20,9 +20,8 @@ public class CreateRoomAction implements Runnable{
         if (GameRoomManager.rooms.containsKey(roomID)){
             log.error("Existed roomID:"+roomID);
         }
-        BaseGameRoom game = new XiangqiGameRoom(roomID);
+        BaseGameRoom game = new XiangqiGameRoom(roomID, client);
         game.addPlayer(client);
-        game.changeHost(client);
         GameRoomManager.rooms.put(roomID, game);
         GamePacket response = new GamePacket(eChessPackage.GAME_ROOM);
         response.writeData("type", eGameRoom.CREATE_ROOM.getValue());

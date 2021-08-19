@@ -12,8 +12,15 @@ public abstract class AbstractBaseClient {
     protected DateTime disconnectedAt;
     protected String userID;
 
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    protected boolean isConnected;
+
     public AbstractBaseClient(SocketIOClient socket, String userID) {
         this.socket = socket;
         this.userID = userID;
+        this.isConnected = false;
     }
 }

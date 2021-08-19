@@ -22,10 +22,11 @@ public class XiangqiGameRoom extends BaseGameRoom {
     }
     private XiangqiBoard game;
     private int turnTime;
-    public XiangqiGameRoom(String roomID) {
+    public XiangqiGameRoom(String roomID, GameClient host) {
         super(roomID);
         slots = new GameClient[2];
         turnTimer = new Future[2];
+        this.host = host;
         turnTime = DEFAULT_GAME_TIME;
         turnService = Executors.newScheduledThreadPool(1);
         turnActions[XiangqiGameRoom.RED] = new CountDownTurnAction(DEFAULT_GAME_TIME, this, XiangqiGameRoom.RED);
@@ -57,6 +58,14 @@ public class XiangqiGameRoom extends BaseGameRoom {
     public void onPlayerClosed(GameClient client) {
         if (this.isPlayerReady(client) && this.isPlaying == false){
             this.removePlayerByClient(client);
+        }
+        if (isHost(client)){
+            for (int i = 0; i < players.size(); i++) {
+                GameClient temp = players.get(i);
+                if (temp != client && temp.isConnected()){
+                    changeHost(temp);
+                }
+            }
         }
     }
     @Override
