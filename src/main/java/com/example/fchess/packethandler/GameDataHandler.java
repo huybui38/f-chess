@@ -42,7 +42,7 @@ public class GameDataHandler implements IPacketHandler {
                 if (client.gamePlayer.isViewer()){
                     return;
                 }
-                client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
+                        client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
                 break;
             default:
                 log.error("NOT FOUND eGameData:{}",packageType);

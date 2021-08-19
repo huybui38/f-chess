@@ -43,8 +43,8 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.SELECT_TEAM.getValue());
         GameClient[] slots = room.getSlots();
-        pkg.writeData("red", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
-        pkg.writeData("black", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("black", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
+        pkg.writeData("red", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
         pkg.writeData("ready",room.getReady());
         pkg.serialize();
         this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
@@ -55,8 +55,8 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.ROOM_INFO.getValue());
         GameClient[] slots = room.getSlots();
-        pkg.writeData("red", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
-        pkg.writeData("black", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("black", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
+        pkg.writeData("red", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
         pkg.writeData("ready",room.getReady());
         pkg.writeData("isPlaying",room.isPlaying());
         if (room.isPlaying()){

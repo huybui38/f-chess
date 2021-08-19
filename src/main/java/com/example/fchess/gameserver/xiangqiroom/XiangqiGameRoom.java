@@ -75,6 +75,9 @@ public class XiangqiGameRoom extends BaseGameRoom {
             stopTurnTimer(client.gamePlayer.getTeam());
             startTurnTimer(game.getCurrentTurn());
             client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
+            if (game.isCheckmated()){
+                endGame(client.gamePlayer.getTeam());
+            }
         }
     }
 

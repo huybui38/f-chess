@@ -14,11 +14,10 @@ public abstract class AbstractBoard implements IBoard{
     public abstract boolean onReceiveGameData( String source, String destination);
     protected GameClient red;
     protected GameClient black;
-
+    public abstract boolean isCheckmated();
     public int getCurrentTurn() {
         return turn;
     }
-
     protected int turn;
     public void startGame(){
         onStartGame();
