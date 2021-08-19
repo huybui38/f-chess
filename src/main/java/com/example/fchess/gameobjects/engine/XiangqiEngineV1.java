@@ -2,6 +2,7 @@ package com.example.fchess.gameobjects.engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class XiangqiEngineV1 {
     private int mailbox[] = new int[]{
@@ -125,12 +126,20 @@ public class XiangqiEngineV1 {
     private final int[] ELEPHANT_MOVE_OFFSETS = new int[] {
             (UP + LEFT) * 2, (UP + RIGHT) *2, (DOWN + LEFT) *2, (DOWN + RIGHT) *2
     };
+    private final int[][] HORSE_MOVE_OFFSETS = new int[][]{
+            { UP * 2 + LEFT, UP *2 + RIGHT},
+            { DOWN * 2 + LEFT, DOWN *2 + RIGHT },
+            { LEFT *2 + UP, LEFT*2 + DOWN},
+            { RIGHT *2 + UP, RIGHT*2 + DOWN},
+    };
+
+    public int getSide() {
+        return side;
+    }
 
     private int side;
+
     private int[] kingPositionsCache = new int[2];
-
-
-
 
     public XiangqiEngineV1(){
         this.init();
@@ -291,21 +300,6 @@ public class XiangqiEngineV1 {
         }
         return false;
     }
-    public void debugAttack(){
-        for (int rank = 0; rank < 14; rank++) {
-            for (int file = 0; file < 11; file++) {
-                int square = rank * 11 + file;
-                if (board[square] != OUT){
-                    if (isAttack(square, side)) System.out.print("x ");
-                    else
-                        System.out.print(MAP_PIECE_TO_CHAR[board[square]] + " ");
-                }
-                if (file == 10){
-                    System.out.println();
-                }
-            }
-        }
-    }
     public int createUniqueID(int targetSquare, int sourceSquare){
         return targetSquare |
                 (sourceSquare << 8);
@@ -319,12 +313,10 @@ public class XiangqiEngineV1 {
                 value = encode(sourceSquare, targetSquare, sourcePiece, targetPiece, 1);
             }
             Move m = new Move(value);
-            test++;
             this.hashMoves.put(createUniqueID(targetSquare, sourceSquare), m);
             this.moves.add(m);
         }
     }
-    private int test = 0;
     private int encode(int sourceSquare, int targetSquare, int sourcePiece, int targetPiece, int capture){
         return (sourceSquare) |
                 (targetSquare << 8) |
@@ -348,17 +340,75 @@ public class XiangqiEngineV1 {
         return (move >> 24) & 0x1;
     }
 
-    private boolean isInPlace(int piece){
+    private boolean isInPlace(int square){
+        if (side == RED){
+            if ((square >= 125 && square <= 127) || (square >= 114 && square <= 116) || (square >= 103 && square <= 105)){
+                return true;
+            }
+        }else {
+            if ((square >= 26 && square <= 28) || (square >= 37 && square <= 39) || (square >= 48 && square <= 50)){
+                return true;
+            }
+        }
         return false;
     }
-    public boolean move(int sourceSquare, int targetSquare){
+    public int convertPosition(String position){
+        if (position.length() != 2)
+            return -1;
+        position = position.toUpperCase(Locale.ROOT);
+        int file = position.charAt(0) - 65;
+        int rank = position.charAt(1) - 48;
+        if (file < 0 || file > 8)
+            return -1;
+        if (rank < 0 || rank > 9)
+            return -1;
+        int basis;
+        switch (rank){
+            case 0:
+                basis = 122;
+                break;
+            case 1:
+                basis = 111;
+                break;
+            case 2:
+                basis = 100;
+                break;
+            case 3:
+                basis = 89;
+                break;
+            case 4:
+                basis = 78;
+                break;
+            case 5:
+                basis = 67;
+                break;
+            case 6:
+                basis = 56;
+                break;
+            case 7:
+                basis = 45;
+                break;
+            case 8:
+                basis = 34;
+                break;
+            default:
+                basis = 23;
+                break;
+        }
+        return basis + file;
+    }
+    public boolean move(String source, String target){
+        int sourceSquare = convertPosition(source);
+        int targetSquare = convertPosition(target);
+        if (sourceSquare == -1 || targetSquare == -1)
+            return false;
         int id = createUniqueID(targetSquare, sourceSquare);
         if (!hashMoves.containsKey(id))
             return false;
         Move m = hashMoves.get(id);
-        return actualMove(m);
+        return move(m);
     }
-    public boolean actualMove(Move m){
+    private boolean move(Move m){
         movesHistory.add(new MoveHistory(m, side));
         int sourceSquare = getSourceSquare(m.getMove());
         int targetSquare = getTargetSquare(m.getMove());
@@ -369,17 +419,22 @@ public class XiangqiEngineV1 {
         board[sourceSquare] = EMPTY;
 
         if (getPieceType(board[targetSquare]) == KING){
+//            System.out.println("King position changed: "+ kingPositionsCache[side] + "=> " + targetSquare);
             kingPositionsCache[side] = targetSquare;
         }
-        if (isAttack(kingPositionsCache[side], side ^1)){
+        if (isInCheck()){
             undo();
             return false;
         }
         side ^= 1;
-        generateMovesV1();
         return true;
     }
-    public void undo(){
+    private boolean isInCheck(){
+        return isAttack(kingPositionsCache[side], side ^1);
+    }
+    public boolean undo(){
+        if (movesHistory.size() == 0)
+            return false;
         int lastestIndex = movesHistory.size() -1;
         MoveHistory moveHistory = movesHistory.get(lastestIndex);
         int sourceSquare = getSourceSquare(moveHistory.getValue().getMove());
@@ -394,17 +449,19 @@ public class XiangqiEngineV1 {
             board[targetSquare] = targetPiece;
         }
         if (getPieceType(board[sourceSquare]) == KING){
-            kingPositionsCache[side] = sourceSquare;
+            System.out.println("King position changed: "+ kingPositionsCache[getPieceSide(board[sourceSquare])] + "=> " + sourceSquare);
+            kingPositionsCache[getPieceSide(board[sourceSquare])] = sourceSquare;
         }
         side = moveHistory.getSide();
         movesHistory.remove(lastestIndex);
+        return true;
     }
-    private boolean isOverBank(int piece){
-        int pieceSide = getPieceSide(piece);
-        if (pieceSide == RED){
-            if ((piece >= 23 && piece <=31) || (piece >= 34 && piece <= 42) || (piece >= 45 && piece <=53) || (piece >= 56 && piece <= 64) || (piece >= 67 && piece <= 75) ) return true;
+    private boolean isOverBank(int square){
+//        int pieceSide = getPieceSide(board[square]);
+        if (side == RED){
+            if ((square >= 23 && square <=31) || (square >= 34 && square <= 42) || (square >= 45 && square <=53) || (square >= 56 && square <= 64) || (square >= 67 && square <= 75) ) return true;
         }else {
-            if ((piece >= 78 && piece <= 86) || (piece >= 89 && piece <= 97) || (piece >= 100 && piece <= 108) || (piece >= 111 && piece <= 119) || (piece >= 122 && piece <= 130) ) return true;
+            if ((square >= 78 && square <= 86) || (square >= 89 && square <= 97) || (square >= 100 && square <= 108) || (square >= 111 && square <= 119) || (square >= 122 && square <= 130) ) return true;
         }
         return false;
     }
@@ -429,11 +486,11 @@ public class XiangqiEngineV1 {
                     }
 
                     if (pieceType == HORSE){
-                        for (int i = 0; i < DIAGONALS.length; i++) {
-                            int target = source + DIAGONALS[i];
-                            if (board[target] != EMPTY){
+                        for (int i = 0; i < ORTHOGONALS.length; i++) {
+                            int target = source + ORTHOGONALS[i];
+                            if (board[target] == EMPTY){
                                 for (int j = 0; j < 2; j++) {
-                                    target = source + HORSE_ATTACK_OFFSETS[i][j];
+                                    target = source + HORSE_MOVE_OFFSETS[i][j];
                                     if (board[target] != OUT) pushMove(target, source, board[target], board[source]);
                                 }
                             }
@@ -444,21 +501,21 @@ public class XiangqiEngineV1 {
                         for (int i = 0; i < DIAGONALS.length; i++) {
                             int target = source + ELEPHANT_MOVE_OFFSETS[i];
                             int jumpOver = source + DIAGONALS[i];
-                            if ( board[jumpOver] == EMPTY && isOverBank(board[target]) == false) pushMove(target, source, board[target], board[source]);
+                            if ( board[jumpOver] == EMPTY && isOverBank(target) == false) pushMove(target, source, board[target], board[source]);
                         }
                     }
 
                     //
                     if (pieceType == KING || pieceType == ADVISOR){
-                        for (int i = 0; i < DIAGONALS.length; i++) {
+//                        for (int i = 0; i < DIAGONALS.length; i++) {
                             int[] directions = (pieceType == KING) ? ORTHOGONALS : DIAGONALS;
                             for (int j = 0; j < directions.length; j++) {
-                                int target = source + directions[i];
+                                int target = source + directions[j];
                                 if (isInPlace(target)){
                                     pushMove(target, source, board[target], board[source]);
                                 }
                             }
-                        }
+//                        }
                     }
                     //
                     if (pieceType == CANNON || pieceType == ROOK){
@@ -485,6 +542,19 @@ public class XiangqiEngineV1 {
                 }
             }
         }
-        return moves;
+        return (ArrayList<Move>) moves.clone();
+    }
+    public int Perft(int depth){
+        int nodes = 0;
+        if (depth == 0) return 1;
+        ArrayList<Move> moves = generateMovesV1();
+        for (int i = 0; i < moves.size(); i++) {
+            boolean isValid = move(moves.get(i));
+            if (isValid){
+                nodes += Perft(depth -1);
+                undo();
+            }
+        }
+        return nodes;
     }
 }
