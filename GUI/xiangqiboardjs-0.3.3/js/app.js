@@ -35,8 +35,8 @@ const HASH_MESSAGE = {
     "GAME_ROOM.CHAT.PLAYER_JOINED":"Player {0} has joined the room!"
 }
 const TEAM = {
-    RED:0,
-    BLACK:1
+    RED:1,
+    BLACK:0
 }
 const getHashMessage = (hash) => {
     if (!HASH_MESSAGE[hash]) return hash;
@@ -138,7 +138,7 @@ function initGameRoomEvent(response){
     }
 }
 function getTeamName(team){
-    return team === 0 ? 'red' : 'black'
+    return team === 1 ? 'red' : 'black'
 }
 const roomEvent = {
     joinRoom:1,
@@ -214,8 +214,8 @@ function onReady() {
     socket.emit("gameRoom", produceEvent(roomEvent.createRoom));
   });
   $("#myBoard").hide();
-  $("#red").on("click", () => onSelectTeam(socket, 0));
-  $("#black").on("click", () => onSelectTeam(socket, 1));
+  $("#red").on("click", () => onSelectTeam(socket, 1));
+  $("#black").on("click", () => onSelectTeam(socket, 0));
   $("#btnStartGame").on("click",() => sendStartGame(socket))
   $("#btnSurrender").on("click",() => sendSurrenderGame(socket))
   $("#btnExitRoom").on("click",() => sendExitRoom(socket))

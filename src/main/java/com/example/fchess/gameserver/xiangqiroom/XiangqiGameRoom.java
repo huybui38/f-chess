@@ -62,6 +62,9 @@ public class XiangqiGameRoom extends BaseGameRoom {
         boolean result = game.onReceiveGameData(data.getSource(), data.getTarget());
         if (result){
             client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
+            if (game.isCheckmated()){
+                endGame(client.gamePlayer.getTeam());
+            }
         }
     }
 

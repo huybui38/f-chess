@@ -35,7 +35,7 @@ public class XiangqiEngineV1 {
     };
     public int board[] = new int[11 * 14];
     private char[] MAP_PIECE_TO_CHAR = new char[]{
-            '.', 'P', 'A', 'E', 'H', 'C', 'R', 'K', 'p', 'a', 'e', 'h', 'c', 'r', 'k'
+            '.', 'P', 'A', 'B', 'N', 'C', 'R', 'K', 'p', 'a', 'b', 'n', 'c', 'r', 'k'
     };
     private HashMap<Integer, Move> hashMoves;
     private ArrayList<Move> moves;
@@ -139,17 +139,49 @@ public class XiangqiEngineV1 {
 
     private int side;
 
+    private boolean checkmated;
+    public boolean getCheckmate(){
+        return checkmated;
+    }
+
     private int[] kingPositionsCache = new int[2];
 
     public XiangqiEngineV1(){
-        this.init();
         this.side = RED;
         this.hashMoves = new HashMap<>();
         this.moves =  new ArrayList<>();
         this.movesHistory =  new ArrayList<>();
+        this.init();
     }
-    private void init(){
-
+    public void init(){
+        resetBoard();
+    }
+    private char getAsciiPiece(int piece){
+        return MAP_PIECE_TO_CHAR[piece];
+//        char result = 'k';
+//        int type = getPieceType(piece);
+//        int side = getPieceSide(piece);
+//        switch (type){
+//            case PAWN:
+//                result = 'p';
+//                break;
+//            case ROOK:
+//                result = 'r';
+//                break;
+//            case CANNON:
+//                result = 'c';
+//                break;
+//            case ADVISOR:
+//                result = 'a';
+//                break;
+//            case HORSE:
+//                result = 'n';
+//                break;
+//            case ELEPHANT:
+//                result = 'e';
+//                break;
+//        }
+//        return side == RED ? Character.toUpperCase(result) : result;
     }
     private int getPieceType(int piece){
         if (BLACK_PAWN == piece || RED_PAWN == piece)
@@ -183,9 +215,9 @@ public class XiangqiEngineV1 {
                 return BLACK_KING;
             case 'c':
                 return BLACK_CANNON;
-            case 'h':
+            case 'n':
                 return BLACK_HORSE;
-            case 'e':
+            case 'b':
                 return BLACK_ELEPHANT;
             case 'a':
                 return BLACK_ADVISOR;
@@ -197,11 +229,11 @@ public class XiangqiEngineV1 {
                 return RED_ROOK;
             case 'C':
                 return RED_CANNON;
-            case 'H':
+            case 'N':
                 return RED_HORSE;
             case 'A':
                 return RED_ADVISOR;
-            case 'E':
+            case 'B':
                 return RED_ELEPHANT;
             case 'P':
                 return RED_PAWN;
@@ -209,6 +241,7 @@ public class XiangqiEngineV1 {
         return EMPTY;
     }
     public void resetBoard(){
+        this.checkmated = false;
         for (int rank = 0; rank < 14; rank++) {
             for (int file = 0; file < 11; file++) {
                 int square = rank * 11 + file;
@@ -339,7 +372,33 @@ public class XiangqiEngineV1 {
     private int getCaptureFlag(int move){
         return (move >> 24) & 0x1;
     }
-
+    public String getFEN(){
+        String result = "";
+        int file = 0;
+        int empty = 0;
+        for (int i = 0; i < board.length; i++) {
+            if (board[i] != OUT){
+                file++;
+                if (board[i] != EMPTY){
+                    if (empty != 0){
+                        result += empty;
+                        empty = 0;
+                    }
+                    result += getAsciiPiece(board[i]);
+                }else empty++;
+                if (file >= 9){
+                    if (empty != 0){
+                        result += empty;
+                        empty = 0;
+                    }
+                    if (i < 122)
+                        result += "/";
+                    file = 0;
+                }
+            }
+        }
+        return result;
+    }
     private boolean isInPlace(int square){
         if (side == RED){
             if ((square >= 125 && square <= 127) || (square >= 114 && square <= 116) || (square >= 103 && square <= 105)){
@@ -419,7 +478,6 @@ public class XiangqiEngineV1 {
         board[sourceSquare] = EMPTY;
 
         if (getPieceType(board[targetSquare]) == KING){
-//            System.out.println("King position changed: "+ kingPositionsCache[side] + "=> " + targetSquare);
             kingPositionsCache[side] = targetSquare;
         }
         if (isInCheck()){
@@ -427,10 +485,44 @@ public class XiangqiEngineV1 {
             return false;
         }
         side ^= 1;
+        generateMovesV1();
+        checkmated = this.isCheckmated();
+        System.out.println("isCheckmate:"+ checkmated);
         return true;
+    }
+    private boolean move(int sourceSquare, int targetSquare, int sourcePiece, int targetPiece, int capture){
+        Move m = new Move(encode(sourceSquare, targetSquare, sourcePiece, targetPiece, capture));
+        return move(m);
     }
     private boolean isInCheck(){
         return isAttack(kingPositionsCache[side], side ^1);
+    }
+    private boolean isCheckmated(){
+        if (!isInCheck()) return false;
+        int source = kingPositionsCache[side];
+        boolean canMove = false;
+        for (int i = 0; i < ORTHOGONALS.length; i++) {
+            int target = source + ORTHOGONALS[i];
+            if (board[target] == OUT) continue;
+            if (board[target] == EMPTY){
+                canMove = move(source, target, board[source], board[target], 0);
+            }else if (getPieceSide(board[target]) != side){
+                canMove = move(source, target, board[source], board[target], 1);
+            }
+            if (canMove){
+                undo();
+                return false;
+            }
+        }
+        for (int i = 0; i < moves.size(); i++) {
+            Move element = moves.get(i);
+            canMove = move(element);
+            if (canMove){
+                undo();
+                return false;
+            }
+        }
+        return canMove == false;
     }
     public boolean undo(){
         if (movesHistory.size() == 0)
@@ -454,6 +546,7 @@ public class XiangqiEngineV1 {
         }
         side = moveHistory.getSide();
         movesHistory.remove(lastestIndex);
+        generateMovesV1();
         return true;
     }
     private boolean isOverBank(int square){
