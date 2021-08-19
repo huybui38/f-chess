@@ -12,8 +12,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class XiangqiGameRoom extends BaseGameRoom {
-    public static final int RED = 0;
-    public static final int BLACK = 1;
+    public static final int RED = 1;
+    public static final int BLACK = 0;
     public static final int DEFAULT_GAME_TIME = 180;
     private final Logger log = LoggerFactory.getLogger(XiangqiGameRoom.class);
     private CountDownTurnAction[] turnActions = new CountDownTurnAction[2];
@@ -47,6 +47,12 @@ public class XiangqiGameRoom extends BaseGameRoom {
         player.Out().sendInfoChessRoom(this);
         log.debug("onPlayerReconnect");
     }
+
+    @Override
+    public void onHostChanged(GameClient player) {
+        player.Out().sendInfoChessRoom(this);
+    }
+
     @Override
     public void onPlayerClosed(GameClient client) {
         if (this.isPlayerReady(client) && this.isPlaying == false){
@@ -72,7 +78,7 @@ public class XiangqiGameRoom extends BaseGameRoom {
             return;
         boolean result = game.onReceiveGameData(data.getSource(), data.getTarget());
         if (result){
-            stopTurnTimer(client.gamePlayer.getTeam());
+            stopTurnTimer(game.getCurrentTurn() ^ 1);
             startTurnTimer(game.getCurrentTurn());
             client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
             if (game.isCheckmated()){
@@ -100,7 +106,8 @@ public class XiangqiGameRoom extends BaseGameRoom {
         turnTimer[team] = turnService.scheduleAtFixedRate(turnActions[team], 0, 1000, TimeUnit.MILLISECONDS);
     }
     private void stopTurnTimer(int team){
-        turnTimer[team].cancel(true);
+        if (turnTimer[team] != null)
+            turnTimer[team].cancel(true);
     }
     private void resetTurnTimer(){
         if (turnTimer[RED] != null && turnTimer[RED].isCancelled() == false){

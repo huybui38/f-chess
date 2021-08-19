@@ -22,6 +22,7 @@ public class CreateRoomAction implements Runnable{
         }
         BaseGameRoom game = new XiangqiGameRoom(roomID);
         game.addPlayer(client);
+        game.changeHost(client);
         GameRoomManager.rooms.put(roomID, game);
         GamePacket response = new GamePacket(eChessPackage.GAME_ROOM);
         response.writeData("type", eGameRoom.CREATE_ROOM.getValue());

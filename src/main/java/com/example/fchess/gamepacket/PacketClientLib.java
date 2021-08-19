@@ -59,6 +59,7 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.writeData("red", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
         pkg.writeData("ready",room.getReady());
         pkg.writeData("isPlaying",room.isPlaying());
+        pkg.writeData("host",room.getHost().playerInfo.getUserID());
         if (room.isPlaying()){
             pkg.writeData("currentPosition", room.getGame().getCurrentPosition());
             pkg.writeData("turn", room.getGame().getCurrentTurn());

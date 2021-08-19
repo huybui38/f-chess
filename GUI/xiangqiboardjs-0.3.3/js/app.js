@@ -121,6 +121,7 @@ function initGameRoomEvent(response){
             $(`#black > span`).html(response.black);
             $(`#red  > span`).show();
             $(`#black  > span`).show();
+            $("#hostPlayer").val(response.host);
             if (response.isPlaying){
                 $("#myBoard").show();
                 toggleTurn(response.turn);

@@ -15,6 +15,12 @@ public abstract class BaseGameRoom {
     protected boolean isPlaying;
     protected String roomID;
     protected List<GameClient> players;
+
+    public GameClient getHost() {
+        return host;
+    }
+
+    protected GameClient host;
     protected int ready;
 
     public int getReady() {
@@ -40,18 +46,21 @@ public abstract class BaseGameRoom {
         isPlaying = playing;
     }
     public abstract void onPlayerReconnect(GameClient client);
+    public abstract void onHostChanged(GameClient client);
     public abstract void onPlayerClosed(GameClient client);
     public abstract void onRemovePlayerFromSlot(GameClient client, int slot);
     public abstract void onAddPlayerToSlot(GameClient client, int slot);
     public abstract void onGameData(GameClient client, GameDataPackage data);
     public abstract void startGame(int turnTime);
     public abstract void endGame(int teamWin);
-
     public void resetRoom(){
         this.isPlaying = false;
     }
 
-
+    public void changeHost(GameClient player){
+        host = player;
+        onHostChanged(player);
+    }
 
     public BaseGameRoom(String roomID) {
         this.ready = 0;
@@ -90,6 +99,7 @@ public abstract class BaseGameRoom {
         for (int i = 0; i < slots.length; i++) {
             if (slots[i] != null && slots[i] == player){
                 slots[i] = null;
+                ready--;
                 onRemovePlayerFromSlot(player, i);
                 return true;
             }
