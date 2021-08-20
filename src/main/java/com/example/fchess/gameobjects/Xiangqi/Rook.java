@@ -12,8 +12,7 @@ public class Rook extends XiangqiPiece {
 
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
-        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
-        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_ROOK : ePieceNotation.BLACK_ROOK;
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.BLACK_ROOK : ePieceNotation.RED_ROOK;
 
         for (int i = 0; i < 4; i++) {
             int fromRow = toRow + dx[i];
@@ -23,8 +22,8 @@ public class Rook extends XiangqiPiece {
                 if (chessBoard[fromRow][fromColumn] == pieceEnum.getNotation()) return true;
                 if (chessBoard[fromRow][fromColumn] != '.') break;
 
-                fromRow = toRow + dx[i];
-                fromColumn = toColumn + dy[i];
+                fromRow = fromRow + dx[i];
+                fromColumn = fromColumn + dy[i];
             }
         }
         return false;

@@ -10,8 +10,8 @@ public enum eXiangqiNotion {
     ROOK('r'),
     ;
 
-    public final char notation;
 
+    public final char notation;
     eXiangqiNotion(char notation) {
         this.notation = notation;
     }

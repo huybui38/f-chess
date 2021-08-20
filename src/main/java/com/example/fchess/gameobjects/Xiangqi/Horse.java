@@ -12,8 +12,7 @@ public class Horse extends XiangqiPiece {
 
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
-        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
-        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_HORSE : ePieceNotation.BLACK_HORSE;
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.BLACK_HORSE : ePieceNotation.RED_HORSE;
 
         for (int i = 0; i < 8; i++) {
             int fromRow = toRow + dx[i];

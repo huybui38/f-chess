@@ -3,6 +3,9 @@ package com.example.fchess.gameobjects.Xiangqi;
 import com.example.fchess.enums.eTeam;
 
 public class Advisor extends XiangqiPiece {
+    private static final int[] dx = {-1, -1, 1, 1};
+    private static final int[] dy = {-1, 1, -1, 1};
+
     public Advisor() {
     }
 

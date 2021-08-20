@@ -12,9 +12,7 @@ public class Cannon extends XiangqiPiece {
 
     @Override
     public boolean isCapture(int toRow, int toColumn, eTeam team, char[][] chessBoard) {
-        if (getTeam(chessBoard[toRow][toColumn]) == team) return false;
-
-        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.RED_CANNON : ePieceNotation.BLACK_CANNON;
+        ePieceNotation pieceEnum = team == eTeam.RED ? ePieceNotation.BLACK_CANNON : ePieceNotation.RED_CANNON;
 
         for (int i = 0; i < 4; i++) {
             int fromRow = toRow + dx[i];
@@ -27,8 +25,8 @@ public class Cannon extends XiangqiPiece {
                 };
 
                 if (chessBoard[fromRow][fromColumn] != '.') count++;
-                fromRow = toRow + dx[i];
-                fromColumn = toColumn + dy[i];
+                fromRow = fromRow + dx[i];
+                fromColumn = fromColumn + dy[i];
             }
         }
         return false;
