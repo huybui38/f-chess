@@ -4,8 +4,8 @@ import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
 public class Cannon extends XiangqiPiece {
-    private static final int[] dx = {0, 0, -1, 1};
-    private static final int[] dy = {-1, 1, 0, 0};
+    public static final int[] dx = {0, 0, -1, 1};
+    public static final int[] dy = {-1, 1, 0, 0};
 
     public Cannon() {
     }
@@ -21,7 +21,6 @@ public class Cannon extends XiangqiPiece {
             while (isOnChessBoard(fromRow, fromColumn)) {
                 if (chessBoard[fromRow][fromColumn] == pieceEnum.getNotation()) {
                     if (count == 1) return true;
-                        else break;
                 };
 
                 if (chessBoard[fromRow][fromColumn] != '.') count++;

@@ -3,8 +3,8 @@ package com.example.fchess.gameobjects.Xiangqi;
 import com.example.fchess.enums.eTeam;
 
 public class Elephant extends XiangqiPiece {
-    private static final int[] dx = {-2, -2, 2, 2};
-    private static final int[] dy = {-2, 2, -2, 2};
+    public static final int[] dx = {-2, -2, 2, 2};
+    public static final int[] dy = {-2, 2, -2, 2};
 
     public Elephant() {
     }

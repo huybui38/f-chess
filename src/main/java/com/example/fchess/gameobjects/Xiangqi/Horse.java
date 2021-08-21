@@ -4,8 +4,8 @@ import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
 public class Horse extends XiangqiPiece {
-    private static final int[] dx = {-2, -2, -1, -1, 1, 1, 2, 2};
-    private static final int[] dy = {-1, 1, -2, 2, -2, 2, -1, 1};
+    public static final int[] dx = {-2, -2, -1, -1, 1, 1, 2, 2};
+    public static final int[] dy = {-1, 1, -2, 2, -2, 2, -1, 1};
 
     public Horse() {
     }

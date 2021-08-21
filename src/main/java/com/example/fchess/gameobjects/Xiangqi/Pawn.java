@@ -4,8 +4,8 @@ import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
 public class Pawn extends XiangqiPiece {
-    private static final int[][] dx = {{0, 0, -1}, {0, 0, 1}};
-    private static final int[][] dy = {{-1, 1, 0},{-1, 1, 0}};
+    public static final int[][] dx = {{0, 0, -1}, {0, 0, 1}};
+    public static final int[][] dy = {{-1, 1, 0},{-1, 1, 0}};
 
     public Pawn() {
     }
