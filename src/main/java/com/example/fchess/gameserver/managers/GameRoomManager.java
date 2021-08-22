@@ -55,8 +55,8 @@ public class GameRoomManager{
     public static void addAction(Runnable action){
         threadPoolExecutor.execute(action);
     }
-    public static void addRoom(GameClient client){
-        addAction(new CreateRoomAction(client));
+    public static void addRoom(GameClient client, boolean isBotRoom){
+        addAction(new CreateRoomAction(client, isBotRoom));
     }
     public static void removeRoom(BaseGameRoom room){
         addAction(new RemoveRoomAction(room));
