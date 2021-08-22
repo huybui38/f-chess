@@ -1,12 +1,13 @@
 package com.example.fchess.gameserver.xiangqiroom;
 
 import com.example.fchess.gameobjects.Xiangqi.XiangqiBoard;
+import com.example.fchess.gameobjects.engine.ai.MoveStrategy;
+import com.example.fchess.gameobjects.engine.ai.NegaMax;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.transmodel.GameDataPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,8 @@ public class XiangqiGameRoom extends BaseGameRoom {
     }
     private XiangqiBoard game;
     private int turnTime;
-    public XiangqiGameRoom(String roomID, GameClient host) {
+    private int botTeam;
+    public XiangqiGameRoom(String roomID, GameClient host, boolean isBotRoom) {
         super(roomID);
         slots = new GameClient[2];
         turnTimer = new Future[2];
@@ -31,10 +33,15 @@ public class XiangqiGameRoom extends BaseGameRoom {
         turnService = Executors.newScheduledThreadPool(1);
         turnActions[XiangqiGameRoom.RED] = new CountDownTurnAction(DEFAULT_GAME_TIME, this, XiangqiGameRoom.RED);
         turnActions[XiangqiGameRoom.BLACK] = new CountDownTurnAction(DEFAULT_GAME_TIME, this, XiangqiGameRoom.BLACK);
+        this.isBotRoom = isBotRoom;
+        if (this.isBotRoom){
+
+        }
     }
+
     @Override
     public boolean canStartGame() {
-        return this.ready == 2;
+        return this.ready == 2 || (isBotRoom && this.ready == 1);
     }
     @Override
     public void addPlayer(GameClient player) {
@@ -54,6 +61,13 @@ public class XiangqiGameRoom extends BaseGameRoom {
         player.Out().sendInfoChessRoom(this);
     }
 
+
+
+    @Override
+    public boolean canAddSlotBotRoom(GameClient player, int slot) {
+        return ready == 0 || player == slots[slot ^ 1];
+    }
+
     @Override
     public void onPlayerClosed(GameClient client) {
         if (this.isPlayerReady(client) && this.isPlaying == false){
@@ -68,6 +82,18 @@ public class XiangqiGameRoom extends BaseGameRoom {
             }
         }
     }
+
+    @Override
+    public void onAfterPlayerMoved(GameClient client) {
+        stopTurnTimer(game.getCurrentTurn() ^ 1);
+        startTurnTimer(game.getCurrentTurn());
+        GameClient temp = client == null ? slots[botTeam ^ 1] : client;
+        temp.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
+        if (game.isCheckmated()){
+            endGame(client == null ? botTeam : client.gamePlayer.getTeam());
+        }
+    }
+
     @Override
     public void onRemovePlayerFromSlot(GameClient client, int slot) {
         client.Out().sendPlayerSlots( this);
@@ -79,6 +105,9 @@ public class XiangqiGameRoom extends BaseGameRoom {
         client.Out().sendPlayerSlots( this);
         client.gamePlayer.setViewer(false);
         client.gamePlayer.setTeam(slot);
+        if (isBotRoom){
+            botTeam = slot ^ 1;
+        }
     }
 
     @Override
@@ -87,25 +116,26 @@ public class XiangqiGameRoom extends BaseGameRoom {
             return;
         boolean result = game.onReceiveGameData(data.getSource(), data.getTarget());
         if (result){
-            stopTurnTimer(game.getCurrentTurn() ^ 1);
-            startTurnTimer(game.getCurrentTurn());
-            client.Out().sendGameDataBoard(game.getCurrentPosition(), game.getCurrentTurn());
-            if (game.isCheckmated()){
-                endGame(client.gamePlayer.getTeam());
+            onAfterPlayerMoved(client);
+            if (isBotRoom){
+                game.onBotTurn();
+                onAfterPlayerMoved(null);
             }
         }
     }
-
     @Override
     public void startGame(int turnTime) {
-
-        if (this.ready == 2){
+        if (canStartGame()){
             this.turnTime = turnTime;
             resetTurnTimer();
-            game = new XiangqiBoard(slots[0], slots[1]);
+            game = new XiangqiBoard(slots[0], slots[1], isBotRoom);
             game.startGame();
             this.isPlaying = true;
             startTurnTimer(RED);
+            if (isBotRoom && botTeam == RED){
+                game.onBotTurn();
+                onAfterPlayerMoved(null);
+            }
 //            startTurnTimer(BLACK);
             return;
         }
@@ -132,11 +162,21 @@ public class XiangqiGameRoom extends BaseGameRoom {
     @Override
     public void endGame(int teamWin) {
         if (this.isPlaying() || teamWin < 2 || teamWin >= 0){
-            this.slots[teamWin].gamePlayer.setWin(true);
-            this.slots[teamWin].gamePlayer.onWinning();
-            this.slots[1-teamWin].gamePlayer.setWin(false);
-            this.slots[1-teamWin].gamePlayer.onLosing();
-            this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getUserID());
+            if (isBotRoom){
+                int humanTeam = botTeam ^ 1;
+                boolean isHumanWin = teamWin != botTeam;
+                this.slots[humanTeam].gamePlayer.setWin(isHumanWin);
+                if (isHumanWin){
+                    this.slots[humanTeam].gamePlayer.onWinning();
+                }
+                this.slots[humanTeam].Out().sendEndGame(isHumanWin ? this.slots[humanTeam].playerInfo.getUserID() : "BOT");
+            }else {
+                this.slots[teamWin].gamePlayer.setWin(true);
+                this.slots[teamWin].gamePlayer.onWinning();
+                this.slots[1-teamWin].gamePlayer.setWin(false);
+                this.slots[1-teamWin].gamePlayer.onLosing();
+                this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getUserID());
+            }
             resetRoom();
             resetTurnTimer();
         }

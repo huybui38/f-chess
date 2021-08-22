@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 public class CreateRoomAction implements Runnable{
     private static final Logger log = LoggerFactory.getLogger(CreateRoomAction.class);
     private GameClient client;
-    public CreateRoomAction(GameClient client){
+    private boolean isBotRoom;
+    public CreateRoomAction(GameClient client, boolean isBotRoom){
         this.client = client;
+        this.isBotRoom = isBotRoom;
     }
     @Override
     public void run() {
@@ -20,7 +22,7 @@ public class CreateRoomAction implements Runnable{
         if (GameRoomManager.rooms.containsKey(roomID)){
             log.error("Existed roomID:"+roomID);
         }
-        BaseGameRoom game = new XiangqiGameRoom(roomID, client);
+        BaseGameRoom game = new XiangqiGameRoom(roomID, client, isBotRoom);
         game.addPlayer(client);
         GameRoomManager.rooms.put(roomID, game);
         GamePacket response = new GamePacket(eChessPackage.GAME_ROOM);

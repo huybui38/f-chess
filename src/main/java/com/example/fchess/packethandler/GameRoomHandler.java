@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import org.slf4j.Logger;
 
+import static com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom.BLACK;
+import static com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom.RED;
+
 @PacketHandler(packetName = eChessPackage.GAME_ROOM, handler = GameRoomHandler.class, dataType = DataPackage.class)
 public class GameRoomHandler  implements IPacketHandler{
     private static final Logger log = LoggerFactory.getLogger(GameRoomHandler.class);
@@ -29,7 +32,8 @@ public class GameRoomHandler  implements IPacketHandler{
                     client.Out().sendMessage("GAME_ROOM.CREATE_ROOM.ALREADY_IN_ROOM");
                     return;
                 }
-                GameRoomManager.addRoom(client);
+                Boolean isBotRoom = Boolean.parseBoolean(dataPackage.getData().toString());
+                GameRoomManager.addRoom(client, isBotRoom);
                 break;
             case CHAT:
                 if (client.currentBaseGameRoom == null){
@@ -49,6 +53,10 @@ public class GameRoomHandler  implements IPacketHandler{
                 }
                 if (!client.currentBaseGameRoom.findSlot(team)){
                     client.Out().sendMessage("GAME_ROOM.SELECT_TEAM.POSITION_BUSY");
+                    return;
+                }
+                if (client.currentBaseGameRoom.isBotRoom() && !client.currentBaseGameRoom.canAddSlotBotRoom(client, team)){
+                    client.Out().sendMessage("GAME_ROOM.SELECT_TEAM.FULL");
                     return;
                 }
                 client.currentBaseGameRoom.addPlayerToSlot(team, client);

@@ -14,4 +14,11 @@ public class Move {
     }
 
     private int move;
+
+    @Override
+    public String toString() {
+        int target  = EngineUtils.getTargetSquare(this.move);
+        int source  = EngineUtils.getSourceSquare(this.move);
+        return "source: "+ source +";target"+target;
+    }
 }

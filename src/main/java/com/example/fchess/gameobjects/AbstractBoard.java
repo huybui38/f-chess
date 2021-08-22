@@ -11,6 +11,7 @@ public abstract class AbstractBoard implements IBoard{
     protected abstract void onStartGame();
     protected abstract void onEndGame();
     protected abstract void onPauseGame();
+    public abstract void onBotTurn();
     public abstract boolean onReceiveGameData( String source, String destination);
     protected GameClient red;
     protected GameClient black;

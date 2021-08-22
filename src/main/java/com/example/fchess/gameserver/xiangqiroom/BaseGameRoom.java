@@ -13,6 +13,12 @@ import java.util.concurrent.ScheduledExecutorService;
 public abstract class BaseGameRoom {
 
     protected boolean isPlaying;
+
+    public boolean isBotRoom() {
+        return isBotRoom;
+    }
+
+    protected boolean isBotRoom;
     protected String roomID;
     protected List<GameClient> players;
 
@@ -48,11 +54,13 @@ public abstract class BaseGameRoom {
     public abstract void onPlayerReconnect(GameClient client);
     public abstract void onHostChanged(GameClient client);
     public abstract void onPlayerClosed(GameClient client);
+    public abstract void onAfterPlayerMoved(GameClient client);
     public abstract void onRemovePlayerFromSlot(GameClient client, int slot);
     public abstract void onAddPlayerToSlot(GameClient client, int slot);
     public abstract void onGameData(GameClient client, GameDataPackage data);
     public abstract void startGame(int turnTime);
     public abstract void endGame(int teamWin);
+    public abstract boolean canAddSlotBotRoom(GameClient player, int slot);
     public void resetRoom(){
         this.isPlaying = false;
     }

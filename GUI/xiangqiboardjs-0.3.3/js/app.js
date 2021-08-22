@@ -213,7 +213,10 @@ function onReady() {
     socket.emit("gameRoom", produceEvent(roomEvent.joinRoom, roomID));
   });
   $("#btnCreate").on("click", () => {
-    socket.emit("gameRoom", produceEvent(roomEvent.createRoom));
+    socket.emit("gameRoom", produceEvent(roomEvent.createRoom, false));
+  });
+  $("#btnCreateBot").on("click", () => {
+    socket.emit("gameRoom", produceEvent(roomEvent.createRoom, true));
   });
   $("#myBoard").hide();
   $("#red").on("click", () => onSelectTeam(socket, 1));
