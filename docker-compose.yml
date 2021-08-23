@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: fchess
+      MYSQL_USER: userchess
+      MYSQL_PASSWORD: 123123
+    ports:
+      - "6033:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+volumes:
+  dbdata:
