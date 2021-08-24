@@ -3,11 +3,14 @@ package com.example.fchess.web.controller;
 //import com.example.fchess.web.exception.BadRequestException;
 import com.example.fchess.web.exception.BadRequestException;
 import com.example.fchess.web.model.User;
+import com.example.fchess.web.payload.ApiResponse;
+import com.example.fchess.web.payload.AuthResponse;
 import com.example.fchess.web.payload.LoginRequest;
 import com.example.fchess.web.payload.SignUpRequest;
 import com.example.fchess.web.repository.UserRepository;
 import com.example.fchess.web.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,7 +47,7 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.createToken(authentication);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
     @PostMapping("/signup")
@@ -52,14 +55,12 @@ public class AuthController {
         if (userRepository.existsByEmail(signUpRequest.getEmail())){
             throw new BadRequestException("Email address already in use");
         }
-
         User user = new User();
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setNickname(signUpRequest.getNickname());
         user.setAvatarImg("DEFAULT");
         userRepository.save(user);
-
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(new ApiResponse("AUTH.SIGNUP.SUCCESS", HttpStatus.OK.value()));
     }
 }

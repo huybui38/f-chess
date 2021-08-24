@@ -1,7 +1,9 @@
 package com.example.fchess.web.config;
 
+import com.example.fchess.web.exception.RestAuthenticationFailureHandler;
 import com.example.fchess.web.security.CustomUserDetailsService;
 import com.example.fchess.web.security.JwtAuthenticationFilter;
+import com.example.fchess.web.security.RestAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
@@ -22,6 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
@@ -52,6 +57,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                .formLogin()
+//                    .loginProcessingUrl("/auth/login")
+                    .failureHandler(restAuthenticationFailureHandler)
+                    .and()
+                .exceptionHandling()
+                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                     .and()
                 .authorizeRequests()
                     .antMatchers("/auth/**", "/oauth2/**")

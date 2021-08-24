@@ -4,16 +4,16 @@ import com.example.fchess.web.validator.FieldMatch;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-@FieldMatch(first = "password", second = "rePassword")
+@FieldMatch(first = "password", second = "rePassword", message = "SIGNUP_REQUEST.REPASSWORD.NOT_CORRECT")
 public class SignUpRequest {
     @NotBlank
     @Email
     private String email;
-    @NotBlank
+    @NotBlank(message = "SIGNUP_REQUEST.PASSWORD.NOT_BLANK")
     private String password;
-    @NotBlank
+    @NotBlank(message = "SIGNUP_REQUEST.REPASSWORD.NOT_BLANK")
     private String rePassword;
-    @NotBlank
+    @NotBlank(message = "SIGNUP_REQUEST.NICKNAME.NOT_BLANK")
     private String nickname;
 
 
