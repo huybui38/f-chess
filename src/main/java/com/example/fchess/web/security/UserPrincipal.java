@@ -3,10 +3,12 @@ package com.example.fchess.web.security;
 import com.example.fchess.web.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, OAuth2User {
 
     public Long getId() {
         return id;
@@ -17,8 +19,14 @@ public class UserPrincipal implements UserDetails {
     }
 
     private Long id;
-   private String email;
-   private String password;
+    private String email;
+    private String password;
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    private Map<String, Object> attributes;
 
     public UserPrincipal(Long id, String email, String password) {
         this.id = id;
@@ -29,6 +37,16 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal create(User user){
         return new UserPrincipal(user.getId(), user.getEmail(), user.getPassword());
     }
+    public static UserPrincipal create(User user, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
+    @Override
+    public Map<String, Object> getAttributes() {
+        return this.attributes;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -62,5 +80,10 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

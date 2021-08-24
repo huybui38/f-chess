@@ -7,6 +7,7 @@ import com.example.fchess.gameobjects.engine.Move;
 import com.example.fchess.gameobjects.engine.XiangqiEngineV1;
 import com.example.fchess.gameobjects.engine.ai.MoveStrategy;
 import com.example.fchess.gameobjects.engine.ai.NegaMax;
+import com.example.fchess.web.config.AppProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
-@EnableConfigurationProperties
+@EnableConfigurationProperties(AppProperties.class)
 public class FChessApplication {
     @Value("${rt-server.host}")
     private String host;

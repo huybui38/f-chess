@@ -4,6 +4,10 @@ import com.example.fchess.web.exception.RestAuthenticationFailureHandler;
 import com.example.fchess.web.security.CustomUserDetailsService;
 import com.example.fchess.web.security.JwtAuthenticationFilter;
 import com.example.fchess.web.security.RestAuthenticationEntryPoint;
+import com.example.fchess.web.security.oauth2.CustomOAuth2UserService;
+import com.example.fchess.web.security.oauth2.HttpCookiesAuthorizationRequestRepository;
+import com.example.fchess.web.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.example.fchess.web.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
+    @Autowired
+    private HttpCookiesAuthorizationRequestRepository httpCookiesAuthorizationRequestRepository;
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
@@ -43,7 +49,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    @Autowired
+    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(){
         return new JwtAuthenticationFilter();
@@ -69,7 +80,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/auth/**", "/oauth2/**")
                         .permitAll()
                     .anyRequest()
-                        .authenticated();
+                        .authenticated()
+                    .and()
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(httpCookiesAuthorizationRequestRepository)
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/authorize/callback/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -18,6 +18,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 1095673906690-iq96bvknlgee4o4lpcgouhkjfopg7ucn.apps.googleusercontent.com
+            clientSecret: qYBkFQtyM0q23xqHABlMYk-N
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
 app:
   auth:
     tokenSecret: KMASKD9123BHAF123
+  oauth2:
+    authorizedRedirectUris:
+       - http://localhost:3000/oauth2/redirect
+server:
+  port: 8888
