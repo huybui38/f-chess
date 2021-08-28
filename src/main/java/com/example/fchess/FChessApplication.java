@@ -32,49 +32,8 @@ public class FChessApplication {
     }
 
     public static void main(String[] args) {
-        ArrayList<Integer> moveList = new ArrayList<>();
-
         SpringApplication.run(FChessApplication.class, args);
         //TEST HERE
-        XiangqiBoard chessBoard = new XiangqiBoard("5a3/3k5/3aR4/9/5r3/5n3/9/3A1A3/5K3/2BC2B2", null, null);
-        moveList = chessBoard.generateMovesV2();
-        chessBoard.showChessBoard();
-        int countTest = chessBoard.Perft(3);
-        System.out.println("test: " + countTest);
-
-//        String s1 = chessBoard.getSquareFromCoordinate(2, 1);
-//        String t1 = chessBoard.getSquareFromCoordinate(1, 1);
-//        String s2 = chessBoard.getSquareFromCoordinate(9, 6);
-//        String t2 = chessBoard.getSquareFromCoordinate(7, 8);
-//        String s3 = chessBoard.getSquareFromCoordinate(9, 1);
-//        String t3 = chessBoard.getSquareFromCoordinate(9, 3);
-
-//        chessBoard.makeMove(s1, t1);
-//        chessBoard.makeMove(s2, t2);
-//        chessBoard.makeMove(s3, t3);
-
-        System.out.println(chessBoard.countMove);
-//        for (int i = 0; i < moveList.size(); i++) {
-//            int move = moveList.get(i);
-//            System.out.println(move + " => " + chessBoard.getSourceSquare(move) + chessBoard.getTargetSquare(move));
-//            System.out.println(chessBoard.getSourcePiece(move) + " => " + chessBoard.getTargetPiece(move) + " " + chessBoard.getCaptureFlag(move));
-//            System.out.println("----------------------------------------");
-//        }
-//
-
-//        chessBoard.showChessBoard();
-//        chessBoard.takeBack();
-//        for (int i = 0; i < chessBoard.moveList.size(); i++) {
-//            int move = chessBoard.moveList.get(i);
-//            System.out.println(move + " => " + chessBoard.getSourceSquare(move) + chessBoard.getTargetSquare(move));
-//            System.out.println(chessBoard.getSourcePiece(move) + " => " + chessBoard.getTargetPiece(move) + " " + chessBoard.getCaptureFlag(move));
-//        }
-//        chessBoard.showChessBoard();
-//
-//        String s4 = chessBoard.getSquareFromCoordinate(2, 7);
-//        String t4 = chessBoard.getSquareFromCoordinate(2, 4);
-//        chessBoard.makeMove(s4, t4);
-//        chessBoard.showChessBoard();
-    //
-}
+        XiangqiBoard board = new XiangqiBoard(null, null);
+    }
 }

@@ -44,4 +44,12 @@ public enum ePieceNotation {
         }
         return null;
     }
+    public static int getIdFromNotation(char notation) {
+        for (ePieceNotation type : values()) {
+            if (type.getNotation() == notation) {
+                return type.getId();
+            }
+        }
+        return -1;
+    }
 }

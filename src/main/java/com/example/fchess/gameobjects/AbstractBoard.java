@@ -19,7 +19,7 @@ public abstract class AbstractBoard implements IBoard{
         return turn;
     }
 
-    protected int turn = 1;
+    protected int turn;
     public void startGame(){
         onStartGame();
     }

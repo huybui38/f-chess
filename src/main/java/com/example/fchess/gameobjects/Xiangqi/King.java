@@ -4,7 +4,7 @@ import com.example.fchess.enums.ePieceNotation;
 import com.example.fchess.enums.eTeam;
 
 public class King extends XiangqiPiece {
-    public static final int[][] dx = {{-1}, {1}};
+    public static final int[][] dx = {{1}, {-1}};
     public static final int[][] dy = {{0}, {0}};
 
     public King() {
