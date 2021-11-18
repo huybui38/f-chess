@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -18,7 +19,7 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping("/me")
-    public User getMe(@CurrentUser UserPrincipal userPrincipal){
+    public User getMe(@CurrentUser UserPrincipal userPrincipal) {
         return userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
     }

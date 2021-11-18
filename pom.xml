@@ -73,6 +73,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>FChess</finalName>
     </build>
+    <packaging>jar</packaging>
 
 </project>

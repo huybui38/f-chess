@@ -10,16 +10,16 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo{
 
     @Override
     public String getName() {
-        return null;
+        return this.attributes.get("name").toString();
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return this.attributes.get("email").toString();
     }
 
     @Override
     public String getAvatar() {
-        return null;
+        return this.attributes.get("picture").toString();
     }
 }

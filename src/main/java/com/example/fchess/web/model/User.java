@@ -1,5 +1,7 @@
 package com.example.fchess.web.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
@@ -16,7 +18,7 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     private String avatarImg;
