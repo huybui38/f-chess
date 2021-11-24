@@ -88,6 +88,7 @@ public abstract class BaseSocketServer {
                 base = clients.get(token);
                 base.socket.sendEvent("onconflict");
                 base.socket.disconnect();
+                client.set("forceDisconnect", true);
                 base.setSocket(client);
                 base.onReconnect();
                 log.debug("Same client");
@@ -107,13 +108,15 @@ public abstract class BaseSocketServer {
     }
     private DisconnectListener onDisconnected() {
         return client -> {
+            boolean isForceDisconnect = client.get("forceDisconnect") == null ? false : client.get("forceDisconnect");
             String token  = client.getHandshakeData().getSingleUrlParam("token");
             BaseClient base = clients.get(token);
-            if ( base != null){
+            if ( base != null && !isForceDisconnect){
                 base.setDisconnectedAt(DateTime.now());
                 base.onClosed();
             }
-            log.debug("Client[{}] - Disconnected from chat module.", token);
+            client.set("forceDisconnect", false);
+            log.info("Client[{}] - Disconnected from module.", client.getSessionId().toString());
         };
     }
 }
