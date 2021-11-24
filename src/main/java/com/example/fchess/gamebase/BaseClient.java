@@ -31,7 +31,7 @@ public class BaseClient extends AbstractBaseClient{
     }
     public boolean canRemove() {
         DateTime now = DateTime.now();
-        if (disconnectedAt.isBefore(now)) {
+        if (disconnectedAt != null && disconnectedAt.isBefore(now)) {
             Seconds diff = Seconds.secondsBetween(disconnectedAt, now);
             log.debug("Compare {} {}",disconnectedAt.toString(), now.toString());
             return diff.getSeconds() >= DEFAULT_TIMEOUT;
@@ -41,16 +41,23 @@ public class BaseClient extends AbstractBaseClient{
 
     @Override
     protected void onDisconnected() {
-
+        this.isConnected = false;
     }
 
     @Override
     protected void onConnected() {
         socket.sendEvent("connected", socket.getHandshakeData().getSingleUrlParam("token"));
+        this.isConnected = true;
     }
     @Override
     protected void onReconnect() {
         disconnectedAt = DateTime.now().plusDays(1);
+        this.isConnected = true;
+    }
+
+    @Override
+    protected void onClosed() {
+        this.isConnected = false;
     }
 
 }

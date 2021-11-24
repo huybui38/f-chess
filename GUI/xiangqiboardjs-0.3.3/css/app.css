@@ -1,0 +1,37 @@
+.debug{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100vw;
+}
+#console {
+    height: 200px;
+    width: 400px;
+    overflow: auto;
+}
+
+.username-msg {
+    color: orange;
+}
+
+.connect-msg {
+    color: green;
+}
+.current{
+ border-color: red !important;
+}
+.disconnect-msg {
+    color: red;
+}
+.choose-team{
+    display: flex;
+    flex-direction: row;
+   
+}
+.team{
+    margin-right:10px;
+    padding:10px;
+    border: solid;
+    cursor: pointer;
+}
