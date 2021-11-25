@@ -47,12 +47,12 @@ public class FChessApplication {
 //        engineV1.setBoard("CRH1k1e2/3ca4/4ea3/9/2hr5/9/9/4E4/4A4/4KA3");
         String fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR";
         engineV1.setBoard(fen);
-//        engineV1.generateMovesV1();
-////        boolean result = engineV1.move("A0", "A4");
-//        engineV1.printBoard();
-////        System.out.println(result);
-//        System.out.println(fen);
-//        System.out.println(engineV1.getFEN());
+//      engineV1.generateMovesV1();
+////    boolean result = engineV1.move("A0", "A4");
+//      engineV1.printBoard();
+////    System.out.println(result);
+//      System.out.println(fen);
+//      System.out.println(engineV1.getFEN());
 //        System.out.println(engineV1.getFEN().equals(fen));
 //        for (int i = 0; i < list.size(); i++) {
 //            Move m = list.get(i);

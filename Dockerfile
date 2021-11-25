@@ -20,3 +20,4 @@ WORKDIR /app
 COPY --from=MAVEN_BUILD /build/target/FChess.jar /app/
 
 ENTRYPOINT ["java", "-jar", "FChess.jar"]
+
