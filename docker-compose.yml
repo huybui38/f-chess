@@ -8,12 +8,13 @@ services:
       context: .
     ports:
       - "8888:8888"
+      - "9092:9092"
     networks:
       - f-network
     depends_on:
       - db
   db:
-    image: mysql
+    image: mysql:latest
     container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: 123123

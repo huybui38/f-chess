@@ -8,6 +8,11 @@ import java.util.TimerTask;
 
 public class CountDownTurnAction implements Runnable {
     private final Logger log = LoggerFactory.getLogger(CountDownTurnAction.class);
+
+    public long getTimeLeft() {
+        return timeLeft;
+    }
+
     private long timeLeft;
     private BaseGameRoom room;
     private int team;

@@ -5,7 +5,8 @@ public enum eGameData {
     GAME_UNDO(1),
     GAME_PAUSE(2),
     GAME_SURRENDER(3),
-    GAME_END(4);
+    GAME_END(4),
+    GAME_SYNC(5);
     public final int label;
     eGameData(int label) {
         this.label = label;

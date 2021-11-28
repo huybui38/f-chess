@@ -40,6 +40,14 @@ public class XiangqiGameRoom extends BaseGameRoom {
     }
 
     @Override
+    public long[] getTimeLeft() {
+        long[] data = new long[2];
+        data[XiangqiGameRoom.RED] =  turnActions[XiangqiGameRoom.RED].getTimeLeft();
+        data[XiangqiGameRoom.BLACK] =  turnActions[XiangqiGameRoom.BLACK].getTimeLeft();
+        return data;
+    }
+
+    @Override
     public boolean canStartGame() {
         return this.ready == 2 || (isBotRoom && this.ready == 1);
     }
