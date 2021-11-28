@@ -136,4 +136,15 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.serialize();
         this.send(pkg);
     }
+
+    @Override
+    public GamePacket syncTime() {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_DATA);
+        BaseGameRoom gameRoom = this.client.currentBaseGameRoom;
+        pkg.writeType(eGameData.GAME_SYNC.getValue());
+        pkg.writeData("time", gameRoom.getTimeLeft());
+        pkg.serialize();
+        this.sendToAllInRoom(pkg, gameRoom.getRoomID());
+        return pkg;
+    }
 }

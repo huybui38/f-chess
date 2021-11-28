@@ -7,10 +7,15 @@ import com.example.fchess.gameobjects.engine.Move;
 import com.example.fchess.gameobjects.engine.XiangqiEngineV1;
 import com.example.fchess.gameobjects.engine.ai.MoveStrategy;
 import com.example.fchess.gameobjects.engine.ai.NegaMax;
+import com.example.fchess.gameserver.xiangqiroom.CountDownTurnAction;
+import com.example.fchess.web.config.AppProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -19,7 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
 public class FChessApplication {
+    private final Logger log = LoggerFactory.getLogger(FChessApplication.class);
     @Value("${rt-server.host}")
     private String host;
 
@@ -32,6 +39,7 @@ public class FChessApplication {
         Configuration config = new Configuration();
         config.setHostname(host);
         config.setPort(port);
+        log.info("Connected to socket server: ${host}:${port} ");
         return new SocketIOServer(config);
     }
 

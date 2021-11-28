@@ -60,6 +60,7 @@ public abstract class BaseGameRoom {
     public abstract void onGameData(GameClient client, GameDataPackage data);
     public abstract void startGame(int turnTime);
     public abstract void endGame(int teamWin);
+    public abstract long[] getTimeLeft();
     public abstract boolean canAddSlotBotRoom(GameClient player, int slot);
     public void resetRoom(){
         this.isPlaying = false;
@@ -136,6 +137,11 @@ public abstract class BaseGameRoom {
         players.remove(player);
         player.getSocket().leaveRoom(this.roomID);
         player.currentBaseGameRoom = null;
+    }
+    public void syncTime(GameClient player){
+        if (player != null){
+            player.Out().syncTime();
+        }
     }
     public GameClient findPlayerByID(String id){
         for (GameClient player:

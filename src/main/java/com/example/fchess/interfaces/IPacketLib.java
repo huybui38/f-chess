@@ -13,4 +13,5 @@ public interface IPacketLib {
     GamePacket sendEndGame(String winnerName);
     GamePacket sendExitRoom(String name);
     GamePacket sendChat(String message, String data, boolean isSystem);
+    GamePacket syncTime();
 }

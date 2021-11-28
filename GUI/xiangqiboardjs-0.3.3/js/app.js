@@ -84,6 +84,10 @@ function initGameDataEvent(response){
         case gameEvent.gameEnd:
             alert("Winner: "+ response.winnerName);
             break;
+        case gameEvent.gameSync:
+            let time = response.time;
+            console.log(time);
+            break;
     }
 }
 function initGameRoomEvent(response){
@@ -154,7 +158,8 @@ const roomEvent = {
 const gameEvent = {
     gameData:0,
     gameSurrender:3,
-    gameEnd:4
+    gameEnd:4,
+    gameSync:5
 }
 function produceEvent(eventType, data){
     return {
