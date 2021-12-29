@@ -4,6 +4,8 @@ import com.example.fchess.gamebase.GamePacket;
 import com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom;
 import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public interface IPacketLib {
     void sendJoinRoom(String roomID);
     void sendJoinNotifyAllPlayersInRoom(String roomID);
@@ -14,4 +16,5 @@ public interface IPacketLib {
     GamePacket sendExitRoom(String name);
     GamePacket sendChat(String message, String data, boolean isSystem);
     GamePacket syncTime();
+    GamePacket sendListRoom(ConcurrentHashMap<String, BaseGameRoom> rooms);
 }

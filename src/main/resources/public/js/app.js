@@ -55,10 +55,12 @@ $(onReady);
 function initEvent(socket){
     socket.on("connect", () => {
         console.log("onConnected");
+        window.roomsListTimer = setInterval(() => requestListRoom(socket), 2000);
     });
     socket.on("gameRoom", initGameRoomEvent)
     socket.on("gameData", initGameDataEvent)
     socket.on("notify", (response) => alert(response.msg));
+    requestListRoom(socket);
 }
 function toggleTurn(turn){
     if (turn === TEAM.RED){
@@ -82,24 +84,38 @@ function initGameDataEvent(response){
         case gameEvent.gameSurrender:
             break;
         case gameEvent.gameEnd:
+            onEndGame();
+            
             alert("Winner: "+ response.winnerName);
             break;
         case gameEvent.gameSync:
-            let time = response.time;
-            console.log(time);
+            $(`#red > .time-left`).html(response.time[TEAM.RED]);
+            $(`#black > .time-left`).html(response.time[TEAM.BLACK]);
             break;
     }
+}
+function onEndGame(){
+    console.log(`onEndGame`);
+    $("#btnStartGame").prop("disabled", false);
+    $("#btnSurrender").prop("disabled", true);
+    $("#time").prop("disabled", false);
+    if (!window.game.isHost){
+        disableForNonHostPLayer();
+    }
+    window.game.isPlaying = false;
 }
 function initGameRoomEvent(response){
     console.log(response);
     switch (response.type) {
         case roomEvent.joinRoom:
         case roomEvent.createRoom:
+            clearInterval(window.roomsListTimer);
             $("#currentRoom").html(response.roomID);
             $("#roomDetail").show();
             $("#wait").show();
             $("#unJoinedSection").hide();
             $("#joinedSection").show();
+            $('#console').html("");
             // output(`<span class="connect-msg">User ${ $("#userID").html()} has joined room (${response.roomID})</span>`);
             break;
         case roomEvent.chat:
@@ -113,21 +129,28 @@ function initGameRoomEvent(response){
         case roomEvent.startGame:
             console.log("game start...")
             toggleTurn(TEAM.RED);
+            onStartGame();
             $("#myBoard").show();
             break;
         case roomEvent.selectTeam:
-            $(`#red > span`).html(response.red);
-            $(`#black > span`).html(response.black);
-            $(`#red  > span`).show();
-            $(`#black  > span`).show();
+            $(`#red > .label-player`).html(response.red);
+            $(`#black > .label-player`).html(response.black);
+            $(`#red  > .label-player`).show();
+            $(`#black  > .label-player`).show();
+            break;
         case roomEvent.roomInfo:
-            $(`#red > span`).html(response.red);
-            $(`#black > span`).html(response.black);
-            $(`#red  > span`).show();
-            $(`#black  > span`).show();
+            $(`#red > .label-player`).html(response.red);
+            $(`#black > .label-player`).html(response.black);
+            $(`#red  > .label-player`).show();
+            $(`#black  > .label-player`).show();
+            window.game.isHost = response.isHost;
+            if (!response.isHost){
+                disableForNonHostPLayer();
+            }
             $("#hostPlayer").html(response.host);
             if (response.isPlaying){
-                $("#myBoard").show();
+               
+                onStartGame();
                 toggleTurn(response.turn);
                 window.board.position(response.currentPosition, true);
                 if (!response.isViewer){
@@ -137,6 +160,9 @@ function initGameRoomEvent(response){
             break;
         case roomEvent.exitRoom:
             output('<span class="connect-msg">'+response.name+' exited</span>');
+            break;
+        case roomEvent.listRoom:
+            renderListRoom(response);
             break;
         default:
             break;
@@ -153,7 +179,8 @@ const roomEvent = {
     roomInfo:5,
     startGame:6,
     resetRoom:7,
-    exitRoom:8
+    exitRoom:8, 
+    listRoom:9
 }
 const gameEvent = {
     gameData:0,
@@ -167,13 +194,46 @@ function produceEvent(eventType, data){
         data
     }
 }
+function showJoinedSection(){
+    $("#myBoard").show();
+}
+function hideJoinedSection(){
+    $("#myBoard").hide();
+    $("#unJoinedSection").show();
+    $("#joinedSection").hide();
+}
 function reset(){
-    $("#userID").html(userID);
+    clearInterval(window.roomsListTimer);
+    window.roomsListTimer = setInterval(() => requestListRoom(socket), 2000);
+    window.game.isHost = false;
+    onEndGame();
     $("#unJoinedSection").show();
     $("#joinedSection").hide();
     $("#wait").hide();
     $("#roomDetail").hide();
-    $("#myBoard").hide();
+    // $("#myBoard").hide();
+}
+function renderListRoom({length, list}){
+    $("#listRoom").html("");
+    for (let index = 0; index < length; index++) {
+        $("#listRoom").append(createRoomElement(list[index]));
+    }
+}
+function disableForNonHostPLayer(){
+    console.log(`disableForNonHostPLayer`);
+    $("#btnStartGame").prop("disabled", true);
+    $("#time").prop("disabled", true);
+}
+function createRoomElement(room){
+    return $($.parseHTML(`   <tr>
+<th scope="row">${room.roomID}</th>
+<td>${room.first}</td>
+<td>${room.second}</td>
+<td >
+
+<button type="button" class="btn btn-primary" onClick="return joinRoom('${room.roomID}'); ">Join now</button>
+</td>
+</tr>`))
 }
 function output(message) {
     var currentTime = "<span class='time'>" + moment().format('HH:mm:ss.SSS') + "</span>";
@@ -184,8 +244,14 @@ function output(message) {
     socket.emit("gameRoom", produceEvent(roomEvent.selectTeam, team));
     window.board.orientation(getTeamName(team));
  }
+ function onStartGame(){
+    $("#btnStartGame").prop("disabled", true);
+    $("#btnSurrender").prop("disabled", false);
+    $("#time").prop("disabled", true);
+ }
  function sendStartGame(socket){
     let time = $("#time").val();
+    window.game.time = time;
     socket.emit("gameRoom", produceEvent(roomEvent.startGame, time));
  }
  function sendSurrenderGame(socket){
@@ -197,21 +263,39 @@ function output(message) {
  } 
  function sendChat(socket){
     let msg = $("#chat").val();
+    $("#chat").val("");
     socket.emit("gameRoom", produceEvent(roomEvent.chat, msg));
  }
+ function requestListRoom(socket){
+    socket.emit("gameRoom", produceEvent(roomEvent.listRoom));
+ }
+
 let currentRoom = null;
+window.roomsListTimer = null;
 function onReady() {
-  let userID = localStorage.getItem("token");
-  if (!userID) {
-    userID = "user" + Math.floor(Math.random() * 1000 + 1);
-    localStorage.setItem("token", userID);
-  };
-  $("#userID").html(userID);
+  let token = localStorage.getItem("token");
+  window.game = {};
+  $.ajax({
+    type: "GET", //GET, POST, PUT
+    url: 'http://localhost:8888/user/me',  //the url to call
+    beforeSend: function (xhr) {   //Include the bearer token in header
+        xhr.setRequestHeader("Authorization", 'Bearer '+ token);
+    }
+}).done(function (response) {
+    if (!response?.email){
+        localStorage.removeItem("token");
+        window.location.href = "/login.html" ;
+    }else{
+        window.game.current = response.nickname;
+        $("#nickName").html(window.game.current);
+    }
+})
   $("#unJoinedSection").show();
   $("#joinedSection").hide();
   $("#wait").hide();
   $("#roomDetail").hide();
-  const socket = io(`ws://localhost:9092/chess?token=${userID}`);
+  $("#btnSurrender").prop("disabled", true);
+  const socket = io(`ws://localhost:9092/chess?token=${token}`);
   initEvent(socket);
   $("#btnJoinRoom").on("click", () => {
     let roomID = $("#roomID").val();
@@ -223,7 +307,7 @@ function onReady() {
   $("#btnCreateBot").on("click", () => {
     socket.emit("gameRoom", produceEvent(roomEvent.createRoom, true));
   });
-  $("#myBoard").hide();
+  $("#myBoard").show();
   $("#red").on("click", () => onSelectTeam(socket, 1));
   $("#black").on("click", () => onSelectTeam(socket, 0));
   $("#btnStartGame").on("click",() => sendStartGame(socket))
@@ -232,4 +316,9 @@ function onReady() {
   $("#btnChat").on("click",() => sendChat(socket))
   window.board = Xiangqiboard("myBoard", config);
   window.socket = socket;
+}
+
+function joinRoom(roomID){
+    window.socket.emit("gameRoom", produceEvent(roomEvent.joinRoom, roomID));
+    return false;
 }

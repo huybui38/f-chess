@@ -1,11 +1,9 @@
 package com.example.fchess.gameserver.xiangqiroom;
 
-import com.corundumstudio.socketio.SocketIOServer;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.transmodel.GameDataPackage;
 
 import java.util.List;
-import java.util.Timer;
 import java.util.Vector;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -134,19 +132,20 @@ public abstract class BaseGameRoom {
         player.getSocket().joinRoom(this.roomID);
     }
     public void removePlayer(GameClient player){
+        removePlayerByClient(player);
         players.remove(player);
         player.getSocket().leaveRoom(this.roomID);
         player.currentBaseGameRoom = null;
     }
-    public void syncTime(GameClient player){
-        if (player != null){
-            player.Out().syncTime();
+    public void syncTime(){
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).Out().syncTime();
         }
     }
     public GameClient findPlayerByID(String id){
         for (GameClient player:
              players) {
-            if (player.playerInfo.getUserID().equals(id)){
+            if (player.playerInfo.getNickName().equals(id)){
                 return player;
             }
         }

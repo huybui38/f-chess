@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import org.slf4j.Logger;
 
-import static com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom.BLACK;
-import static com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom.RED;
-
 @PacketHandler(packetName = eChessPackage.GAME_ROOM, handler = GameRoomHandler.class, dataType = DataPackage.class)
 public class GameRoomHandler  implements IPacketHandler{
     private static final Logger log = LoggerFactory.getLogger(GameRoomHandler.class);
@@ -26,6 +23,9 @@ public class GameRoomHandler  implements IPacketHandler{
         switch (packageType){
             case JOIN_ROOM:
                 handleJoinGameRoom(client, dataPackage.getData().toString());
+                break;
+            case LIST_ROOM:
+                client.Out().sendListRoom(GameRoomManager.rooms);
                 break;
             case CREATE_ROOM:
                 if (client.currentBaseGameRoom != null){
@@ -39,7 +39,7 @@ public class GameRoomHandler  implements IPacketHandler{
                 if (client.currentBaseGameRoom == null){
                     return;
                 }
-                client.Out().sendChat(dataPackage.getData().toString(), client.playerInfo.getUserID(), false);
+                client.Out().sendChat(dataPackage.getData().toString(), client.playerInfo.getNickName(), false);
                 break;
             case SELECT_TEAM:
                 int team =  Integer.parseInt(dataPackage.getData().toString());
@@ -100,7 +100,7 @@ public class GameRoomHandler  implements IPacketHandler{
                 if (client.gamePlayer.isViewer() == false){
                     client.currentBaseGameRoom.endGame(1 - client.gamePlayer.getTeam());
                 }
-                client.Out().sendExitRoom(client.playerInfo.getUserID());
+                client.Out().sendExitRoom(client.playerInfo.getNickName());
                 client.currentBaseGameRoom.removePlayer(client);
                 break;
             default:
@@ -118,7 +118,7 @@ public class GameRoomHandler  implements IPacketHandler{
             client.Out().sendMessage("GAME_ROOM.JOIN_ROOM.NOT_FOUND");
             return;
         }
-        if (room.findPlayerByID(client.playerInfo.getUserID()) != null){
+        if (room.findPlayerByID(client.playerInfo.getNickName()) != null){
             client.Out().sendMessage("GAME_ROOM.JOIN_ROOM.EXISTED");
             return;
         }

@@ -9,6 +9,12 @@ import com.example.fchess.gameserver.xiangqiroom.XiangqiGameRoom;
 import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
 import com.example.fchess.interfaces.IChessSocket;
 import com.example.fchess.interfaces.IPacketLib;
+import com.example.fchess.transmodel.ClientGameRoom;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PacketClientLib implements IPacketLib, IChessSocket {
     private GameClient client;
@@ -33,7 +39,7 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.writeType(eGameRoom.CHAT.getValue());
         pkg.writeData("isSystem", true);
         pkg.writeData("message", "GAME_ROOM.CHAT.PLAYER_JOINED");
-        pkg.writeData("data", this.client.playerInfo.getUserID());
+        pkg.writeData("data", this.client.playerInfo.getNickName());
         pkg.serialize();
         this.sendToAllInRoom(pkg, roomID);
     }
@@ -43,8 +49,8 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.SELECT_TEAM.getValue());
         GameClient[] slots = room.getSlots();
-        pkg.writeData("black", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
-        pkg.writeData("red", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("black", slots[0] == null ? "Empty" : slots[0].playerInfo.getNickName());
+        pkg.writeData("red", slots[1] == null ? "Empty" :  slots[1].playerInfo.getNickName());
         pkg.writeData("ready",room.getReady());
         pkg.serialize();
         this.sendToAllInRoom(pkg, this.client.currentBaseGameRoom.getRoomID());
@@ -55,16 +61,18 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
         pkg.writeType(eGameRoom.ROOM_INFO.getValue());
         GameClient[] slots = room.getSlots();
-        pkg.writeData("black", slots[0] == null ? "" : slots[0].playerInfo.getUserID());
-        pkg.writeData("red", slots[1] == null ? "" :  slots[1].playerInfo.getUserID());
+        pkg.writeData("black", slots[0] == null ? "Empty" : slots[0].playerInfo.getNickName());
+        pkg.writeData("red", slots[1] == null ? "Empty" :  slots[1].playerInfo.getNickName());
         pkg.writeData("ready",room.getReady());
         pkg.writeData("isPlaying",room.isPlaying());
-        pkg.writeData("host",room.getHost().playerInfo.getUserID());
+        pkg.writeData("host",room.getHost().playerInfo.getNickName());
+        pkg.writeData("isHost",room.getHost() == this.client);
+
         if (room.isPlaying()){
             pkg.writeData("currentPosition", room.getGame().getCurrentPosition());
             pkg.writeData("turn", room.getGame().getCurrentTurn());
             pkg.writeData("isViewer", this.client.gamePlayer.isViewer());
-            if (this.client.gamePlayer.isViewer() == false){
+            if (!this.client.gamePlayer.isViewer()){
                 pkg.writeData("team", this.client.gamePlayer.getTeam());
             }
         }
@@ -144,7 +152,31 @@ public class PacketClientLib implements IPacketLib, IChessSocket {
         pkg.writeType(eGameData.GAME_SYNC.getValue());
         pkg.writeData("time", gameRoom.getTimeLeft());
         pkg.serialize();
-        this.sendToAllInRoom(pkg, gameRoom.getRoomID());
+//        this.sendToAllInRoom(pkg, gameRoom.getRoomID());
+        this.send(pkg);
+        return pkg;
+    }
+
+    @Override
+    public GamePacket sendListRoom(ConcurrentHashMap<String, BaseGameRoom> rooms) {
+        GamePacket pkg = new GamePacket(eChessPackage.GAME_ROOM);
+        BaseGameRoom gameRoom = this.client.currentBaseGameRoom;
+        pkg.writeType(eGameRoom.LIST_ROOM.getValue());
+        pkg.writeData("length", rooms.size());
+        List<ClientGameRoom> roomList = new ArrayList<>();
+        for (Map.Entry<String, BaseGameRoom> obj :
+                rooms.entrySet()) {
+            BaseGameRoom baseGameRoom = obj.getValue();
+            ClientGameRoom clientGameRoom = new ClientGameRoom();
+            clientGameRoom.setRoomID(baseGameRoom.getRoomID());
+            clientGameRoom.setPlaying(baseGameRoom.isPlaying());
+            clientGameRoom.setFirst(baseGameRoom.getSlots()[0] == null ? "Empty" :  baseGameRoom.getSlots()[0].playerInfo.getNickName());
+            clientGameRoom.setSecond(baseGameRoom.getSlots()[1] == null ? "Empty" :  baseGameRoom.getSlots()[1].playerInfo.getNickName());
+            roomList.add(clientGameRoom);
+        }
+        pkg.writeData("list", roomList);
+        pkg.serialize();
+        this.send(pkg);
         return pkg;
     }
 }

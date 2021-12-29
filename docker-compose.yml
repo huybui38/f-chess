@@ -6,29 +6,28 @@ services:
     container_name: f-chess-web
     build:
       context: .
-    ports:
-      - "8888:8888"
-      - "9092:9092"
     networks:
       - f-network
     depends_on:
       - db
   db:
-    image: mysql:latest
+    image: postgres:latest
     container_name: db
     environment:
-      MYSQL_ROOT_PASSWORD: 123123
-      MYSQL_DATABASE: fchess
-      MYSQL_USER: userchess
-      MYSQL_PASSWORD: 123123
+#      MYSQL_ROOT_PASSWORD: 123123
+#      MYSQL_DATABASE: fchess
+      POSTGRES_USER: userchess
+      POSTGRES_DB: fchess
+      POSTGRES_PASSWORD: 123123
+      PGDATA: /data/postgres
     ports:
       - "6033:3306"
     volumes:
-      - dbdata:/var/lib/mysql
+      - postgr-data:/data/postgres
     networks:
       - f-network
 volumes:
-  dbdata:
+  postgr-data:
 networks:
   f-network:
     driver: bridge

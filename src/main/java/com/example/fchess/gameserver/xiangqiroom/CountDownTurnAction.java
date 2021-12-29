@@ -24,6 +24,7 @@ public class CountDownTurnAction implements Runnable {
     @Override
     public void run() {
         this.timeLeft--;
+        room.syncTime();
         log.debug("Count down turn team side: {} - value: {}", team, timeLeft);
         if (this.timeLeft <=0){
             room.endGame(1 - team);

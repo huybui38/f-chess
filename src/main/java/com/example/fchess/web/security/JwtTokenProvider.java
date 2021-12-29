@@ -3,6 +3,7 @@ package com.example.fchess.web.security;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class JwtTokenProvider {
     public String createToken(Authentication authentication){
         UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 150000);
+        Date expiryDate = new Date(now.getTime() + 15000000);
         return Jwts.builder()
                 .setSubject(Long.toString(userPrincipal.getId()))
                 .setIssuedAt(new Date())
@@ -23,6 +24,7 @@ public class JwtTokenProvider {
                 .compact();
     }
     public Long getUserIdFromToken(String token) {
+        log.debug(token);
         Claims claims = Jwts.parser()
                 .setSigningKey("SECRET")
                 .parseClaimsJws(token)
@@ -30,6 +32,7 @@ public class JwtTokenProvider {
 
         return Long.parseLong(claims.getSubject());
     }
+
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser().setSigningKey("SECRET").parseClaimsJws(authToken);

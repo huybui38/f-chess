@@ -4,6 +4,9 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.example.fchess.gamebase.BaseClient;
 import com.example.fchess.gamepacket.PacketClientLib;
 import com.example.fchess.gameserver.xiangqiroom.BaseGameRoom;
+import com.example.fchess.web.model.User;
+import com.example.fchess.web.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class GameClient extends BaseClient {
 
@@ -21,7 +24,7 @@ public class GameClient extends BaseClient {
         gamePlayer = new GamePlayer(userID);
     }
     private void LoadFromDatabase(){
-        playerInfo = new PlayerInfo(userID);
+//        playerInfo = new PlayerInfo(nickname, userID);
     }
 
     @Override

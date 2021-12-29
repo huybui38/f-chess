@@ -18,7 +18,8 @@ public class GameServer extends BaseSocketServer {
     @Override
     protected DataListener packetDispatcher(String packet) {
         return (client, data, ackRequest) -> {
-                String token  = client.getHandshakeData().getSingleUrlParam("token");
+            String token  = tokenProvider.getUserIdFromToken(client.getHandshakeData().getSingleUrlParam("token")).toString();
+//            String token = userRepository.findById(userID).get().getNickname();
                 if (clients.containsKey(token)){
                     handlers.get(packet).handle((GameClient) clients.get(token), data);
                 }
@@ -26,6 +27,9 @@ public class GameServer extends BaseSocketServer {
     }
     @Override
     protected BaseClient getNewClient(SocketIOClient client, String token) {
-        return new GameClient(client, token);
+        String nickname = userRepository.findById(Long.parseLong(token)).get().getNickname();
+        GameClient gameClient = new GameClient(client, token);
+        gameClient.playerInfo = new PlayerInfo(nickname, token);
+        return gameClient;
     }
 }

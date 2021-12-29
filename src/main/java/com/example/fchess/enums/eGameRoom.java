@@ -8,7 +8,8 @@ public enum eGameRoom {
     ROOM_INFO (5),
     START_GAME (6),
     RESET_ROOM(7),
-    EXIT_ROOM(8);
+    EXIT_ROOM(8),
+    LIST_ROOM(9);
 
     public final int label;
     eGameRoom(int label) {

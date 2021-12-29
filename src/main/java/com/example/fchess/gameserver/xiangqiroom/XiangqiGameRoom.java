@@ -1,8 +1,6 @@
 package com.example.fchess.gameserver.xiangqiroom;
 
 import com.example.fchess.gameobjects.Xiangqi.XiangqiBoard;
-import com.example.fchess.gameobjects.engine.ai.MoveStrategy;
-import com.example.fchess.gameobjects.engine.ai.NegaMax;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.transmodel.GameDataPackage;
 import org.slf4j.Logger;
@@ -169,7 +167,7 @@ public class XiangqiGameRoom extends BaseGameRoom {
 
     @Override
     public void endGame(int teamWin) {
-        if (this.isPlaying() || teamWin < 2 || teamWin >= 0){
+        if (this.isPlaying()){
             if (isBotRoom){
                 int humanTeam = botTeam ^ 1;
                 boolean isHumanWin = teamWin != botTeam;
@@ -177,13 +175,13 @@ public class XiangqiGameRoom extends BaseGameRoom {
                 if (isHumanWin){
                     this.slots[humanTeam].gamePlayer.onWinning();
                 }
-                this.slots[humanTeam].Out().sendEndGame(isHumanWin ? this.slots[humanTeam].playerInfo.getUserID() : "BOT");
+                this.slots[humanTeam].Out().sendEndGame(isHumanWin ? this.slots[humanTeam].playerInfo.getNickName() : "BOT");
             }else {
                 this.slots[teamWin].gamePlayer.setWin(true);
                 this.slots[teamWin].gamePlayer.onWinning();
                 this.slots[1-teamWin].gamePlayer.setWin(false);
                 this.slots[1-teamWin].gamePlayer.onLosing();
-                this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getUserID());
+                this.slots[teamWin].Out().sendEndGame(this.slots[teamWin].playerInfo.getNickName());
             }
             resetRoom();
             resetTurnTimer();

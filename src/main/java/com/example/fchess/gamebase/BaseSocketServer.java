@@ -10,6 +10,9 @@ import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.example.fchess.gameserver.GameClient;
 import com.example.fchess.interfaces.IPacketHandler;
 import com.example.fchess.interfaces.PacketHandler;
+import com.example.fchess.web.repository.UserRepository;
+import com.example.fchess.web.security.CustomUserDetailsService;
+import com.example.fchess.web.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNullFormatVisitor;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -29,6 +32,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public abstract class BaseSocketServer {
+    @Autowired
+    protected JwtTokenProvider tokenProvider;
+    @Autowired
+    protected UserRepository userRepository;
+
     private static final Logger log = LoggerFactory.getLogger(BaseSocketServer.class);
     protected final SocketIONamespace namespace;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -81,7 +89,7 @@ public abstract class BaseSocketServer {
     }
     private ConnectListener onConnected() {
         return client -> {
-            String token  = client.getHandshakeData().getSingleUrlParam("token");
+            String token  = tokenProvider.getUserIdFromToken(client.getHandshakeData().getSingleUrlParam("token")).toString();
             HandshakeData handshakeData = client.getHandshakeData();
             BaseClient base = null;
             if (clients.containsKey(token)){
@@ -109,7 +117,8 @@ public abstract class BaseSocketServer {
     private DisconnectListener onDisconnected() {
         return client -> {
             boolean isForceDisconnect = client.get("forceDisconnect") == null ? false : client.get("forceDisconnect");
-            String token  = client.getHandshakeData().getSingleUrlParam("token");
+            String token  = tokenProvider.getUserIdFromToken(client.getHandshakeData().getSingleUrlParam("token")).toString();
+//            String token = userRepository.findById(userID).get().getNickname();
             BaseClient base = clients.get(token);
             if ( base != null && !isForceDisconnect){
                 base.setDisconnectedAt(DateTime.now());
