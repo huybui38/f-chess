@@ -12,9 +12,9 @@ spring:
 #    url: jdbc:postgresql://db/fchess
 #    username: userchess
 #    password: 123123
-    url: ${JDBC_DATABASE_URL}
-    username: ${JDBC_DATABASE_USERNAME}
-    password: ${JDBC_DATABASE_PASSWORD}
+    url: ${HEROKU_POSTGRESQL_SILVER_URL}
+    username: ${HEROKU_POSTGRESQL_SILVER_JDBC_USERNAME}
+    password: ${HEROKU_POSTGRESQL_SILVER_JDBC_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
