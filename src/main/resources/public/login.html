@@ -131,7 +131,7 @@
     <script type="text/Javascript">
       //your javascript goes here
       function onBtnClick(){
-        window.location.href ="http://localhost:8888/oauth2/authorize/google?redirect_uri=http://localhost:3000/callback.html";
+        window.location.href = window.location.origin + `/oauth2/authorize/google?redirect_uri=${window.location.origin}/callback.html`;
         return false;
       }
     </script>
