@@ -277,7 +277,7 @@ function onReady() {
   window.game = {};
   $.ajax({
     type: "GET", //GET, POST, PUT
-    url: 'http://localhost:8888/user/me',  //the url to call
+    url: window.location.origin+'/user/me',  //the url to call
     beforeSend: function (xhr) {   //Include the bearer token in header
         xhr.setRequestHeader("Authorization", 'Bearer '+ token);
     }
