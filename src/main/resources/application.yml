@@ -1,5 +1,5 @@
 rt-server:
-  port: 8888
+  port: 9092
   host: 0.0.0.0
 
 logging:
@@ -10,12 +10,12 @@ logging:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/fchess
-#    username: userchess
-#    password: 123123
-    url: ${HEROKU_POSTGRESQL_SILVER_JDBC_URL}
-    username: ${HEROKU_POSTGRESQL_SILVER_JDBC_USERNAME}
-    password: ${HEROKU_POSTGRESQL_SILVER_JDBC_PASSWORD}
+    url: jdbc:postgresql://db/fchess
+    username: userchess
+    password: 123123
+#    url: ${HEROKU_POSTGRESQL_SILVER_JDBC_URL}
+#    username: ${HEROKU_POSTGRESQL_SILVER_JDBC_USERNAME}
+#    password: ${HEROKU_POSTGRESQL_SILVER_JDBC_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

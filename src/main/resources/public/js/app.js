@@ -295,7 +295,7 @@ function onReady() {
   $("#wait").hide();
   $("#roomDetail").hide();
   $("#btnSurrender").prop("disabled", true);
-  const socket = io(`${window.location.origin}/chess?token=${token}`);
+  const socket = io(`ws://localhost:9092/chess?token=${token}`);
   initEvent(socket);
   $("#btnJoinRoom").on("click", () => {
     let roomID = $("#roomID").val();

@@ -21,6 +21,5 @@ COPY --from=MAVEN_BUILD /build/target/FChess.jar /app/
 
 ENTRYPOINT ["java", "-jar", "FChess.jar"]
 
-EXPOSE 8888
-EXPOSE 9092
+
 
