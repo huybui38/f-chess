@@ -39,8 +39,9 @@ app:
     tokenSecret: KMASKD9123BHAF123
   oauth2:
     authorizedRedirectUris:
-       - http://localhost:3000
+       - http://222.255.215.129:3000
        - https://limitless-brook-79118.herokuapp.com
        - http://localhost:8888
+       - http://222.255.215.129
 server:
   port: 8888
