@@ -2,14 +2,14 @@
 version: '3'
 
 services:
-  web:
-    container_name: f-chess-web
-    build:
-      context: .
-    networks:
-      - f-network
-    depends_on:
-      - db
+#  web:
+#    container_name: f-chess-web
+#    build:
+#      context: .
+#    networks:
+#      - f-network
+#    depends_on:
+#      - db
   db:
     image: postgres:latest
     container_name: db
@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: 123123
       PGDATA: /data/postgres
     ports:
-      - "6033:3306"
+      - "5432:5432"
     volumes:
       - postgr-data:/data/postgres
     networks:

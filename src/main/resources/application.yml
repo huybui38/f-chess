@@ -10,7 +10,7 @@ logging:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://db/fchess
+#    url: jdbc:postgresql://localhost:5432/fchess
 #    username: userchess
 #    password: 123123
     url: ${HEROKU_POSTGRESQL_SILVER_JDBC_URL}
@@ -39,6 +39,8 @@ app:
     tokenSecret: KMASKD9123BHAF123
   oauth2:
     authorizedRedirectUris:
-       - http://localhost:3000/oauth2/redirect
+       - http://localhost:3000
+       - https://limitless-brook-79118.herokuapp.com
+       - http://localhost:8888
 server:
   port: 8888
